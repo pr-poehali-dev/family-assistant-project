@@ -95,6 +95,47 @@ interface MealVoting {
   status: 'active' | 'completed';
 }
 
+interface ChildProfile {
+  childId: string;
+  childName: string;
+  age: number;
+  interests: string[];
+  strengths: string[];
+  goals: string[];
+  personality: string;
+}
+
+interface Activity {
+  id: string;
+  name: string;
+  category: string;
+  dayOfWeek: string;
+  time: string;
+  duration: string;
+  location: string;
+  instructor: string;
+  color: string;
+}
+
+interface SkillRecommendation {
+  id: string;
+  skillName: string;
+  category: string;
+  importance: 'high' | 'medium' | 'low';
+  description: string;
+  suggestedActivities: string[];
+  progress: number;
+}
+
+interface DevelopmentPlan {
+  childId: string;
+  childName: string;
+  profile: ChildProfile;
+  schedule: Activity[];
+  skills: SkillRecommendation[];
+  milestones: { title: string; completed: boolean; date: string }[];
+}
+
 export default function Index() {
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([
     { id: '1', name: 'Александр', role: 'Муж', workload: 65, avatar: '👨', points: 450, level: 5, achievements: ['early_bird', 'helper', 'chef'] },
@@ -115,6 +156,212 @@ export default function Index() {
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [showNotification, setShowNotification] = useState(false);
   const [currentNotification, setCurrentNotification] = useState<Reminder | null>(null);
+
+  const [childrenProfiles] = useState<ChildProfile[]>([
+    {
+      childId: '3',
+      childName: 'Максим',
+      age: 10,
+      interests: ['Робототехника', 'Видеоигры', 'Математика', 'Конструкторы'],
+      strengths: ['Логическое мышление', 'Усидчивость', 'Технический склад ума'],
+      goals: ['Создать своего робота', 'Участвовать в олимпиаде по математике', 'Научиться программированию'],
+      personality: 'Аналитический, любознательный, сосредоточенный'
+    },
+    {
+      childId: '4',
+      childName: 'София',
+      age: 7,
+      interests: ['Рисование', 'Танцы', 'Музыка', 'Чтение сказок'],
+      strengths: ['Креативность', 'Эмпатия', 'Хорошая память'],
+      goals: ['Выступить на концерте', 'Научиться рисовать портреты', 'Прочитать 20 книг за год'],
+      personality: 'Эмоциональная, общительная, творческая'
+    }
+  ]);
+
+  const [developmentPlans] = useState<DevelopmentPlan[]>([
+    {
+      childId: '3',
+      childName: 'Максим',
+      profile: {
+        childId: '3',
+        childName: 'Максим',
+        age: 10,
+        interests: ['Робототехника', 'Видеоигры', 'Математика'],
+        strengths: ['Логика', 'Усидчивость'],
+        goals: ['Создать робота', 'Олимпиада'],
+        personality: 'Аналитический'
+      },
+      schedule: [
+        {
+          id: '1',
+          name: 'Робототехника',
+          category: 'STEM',
+          dayOfWeek: 'Вторник',
+          time: '16:00',
+          duration: '1.5 часа',
+          location: 'Центр технического творчества',
+          instructor: 'Иванов И.П.',
+          color: 'bg-blue-100 border-blue-500'
+        },
+        {
+          id: '2',
+          name: 'Программирование Scratch',
+          category: 'IT',
+          dayOfWeek: 'Четверг',
+          time: '17:00',
+          duration: '1 час',
+          location: 'IT-школа "Код"',
+          instructor: 'Петрова Е.А.',
+          color: 'bg-purple-100 border-purple-500'
+        },
+        {
+          id: '3',
+          name: 'Математический кружок',
+          category: 'Образование',
+          dayOfWeek: 'Суббота',
+          time: '10:00',
+          duration: '2 часа',
+          location: 'Лицей №9',
+          instructor: 'Сидоров А.В.',
+          color: 'bg-green-100 border-green-500'
+        }
+      ],
+      skills: [
+        {
+          id: '1',
+          skillName: 'Программирование',
+          category: 'IT',
+          importance: 'high',
+          description: 'Основы кодирования, алгоритмическое мышление',
+          suggestedActivities: ['Scratch', 'Python для детей', 'Робототехника'],
+          progress: 65
+        },
+        {
+          id: '2',
+          skillName: 'Логика и математика',
+          category: 'Образование',
+          importance: 'high',
+          description: 'Развитие аналитического мышления',
+          suggestedActivities: ['Математические олимпиады', 'Шахматы', 'Головоломки'],
+          progress: 75
+        },
+        {
+          id: '3',
+          skillName: 'Командная работа',
+          category: 'Социальные навыки',
+          importance: 'medium',
+          description: 'Умение работать в группе',
+          suggestedActivities: ['Командные проекты', 'Спортивные игры'],
+          progress: 45
+        },
+        {
+          id: '4',
+          skillName: 'Креативное мышление',
+          category: 'Творчество',
+          importance: 'medium',
+          description: 'Генерация новых идей и решений',
+          suggestedActivities: ['Конструирование', 'Рисование', 'Лепка'],
+          progress: 40
+        }
+      ],
+      milestones: [
+        { title: 'Создание первого робота', completed: true, date: 'Октябрь 2025' },
+        { title: 'Участие в региональной олимпиаде', completed: false, date: 'Декабрь 2025' },
+        { title: 'Завершение курса Scratch', completed: false, date: 'Январь 2026' }
+      ]
+    },
+    {
+      childId: '4',
+      childName: 'София',
+      profile: {
+        childId: '4',
+        childName: 'София',
+        age: 7,
+        interests: ['Рисование', 'Танцы', 'Музыка'],
+        strengths: ['Креативность', 'Эмпатия'],
+        goals: ['Выступить на концерте', 'Нарисовать портрет'],
+        personality: 'Творческая'
+      },
+      schedule: [
+        {
+          id: '4',
+          name: 'Художественная студия',
+          category: 'Искусство',
+          dayOfWeek: 'Среда',
+          time: '15:30',
+          duration: '1 час',
+          location: 'Детская школа искусств',
+          instructor: 'Кузнецова М.А.',
+          color: 'bg-pink-100 border-pink-500'
+        },
+        {
+          id: '5',
+          name: 'Хореография',
+          category: 'Танцы',
+          dayOfWeek: 'Пятница',
+          time: '16:30',
+          duration: '1.5 часа',
+          location: 'Танцевальная студия',
+          instructor: 'Новикова Л.В.',
+          color: 'bg-rose-100 border-rose-500'
+        },
+        {
+          id: '6',
+          name: 'Фортепиано',
+          category: 'Музыка',
+          dayOfWeek: 'Воскресенье',
+          time: '11:00',
+          duration: '45 мин',
+          location: 'Музыкальная школа №3',
+          instructor: 'Волкова О.И.',
+          color: 'bg-amber-100 border-amber-500'
+        }
+      ],
+      skills: [
+        {
+          id: '5',
+          skillName: 'Художественное творчество',
+          category: 'Искусство',
+          importance: 'high',
+          description: 'Развитие творческого видения и фантазии',
+          suggestedActivities: ['Рисование', 'Лепка', 'Аппликация'],
+          progress: 80
+        },
+        {
+          id: '6',
+          skillName: 'Музыкальный слух',
+          category: 'Музыка',
+          importance: 'high',
+          description: 'Развитие чувства ритма и мелодии',
+          suggestedActivities: ['Фортепиано', 'Хоровое пение', 'Сольфеджио'],
+          progress: 60
+        },
+        {
+          id: '7',
+          skillName: 'Координация и пластика',
+          category: 'Физическое развитие',
+          importance: 'medium',
+          description: 'Развитие двигательных навыков',
+          suggestedActivities: ['Танцы', 'Гимнастика', 'Йога'],
+          progress: 70
+        },
+        {
+          id: '8',
+          skillName: 'Эмоциональный интеллект',
+          category: 'Социальные навыки',
+          importance: 'medium',
+          description: 'Понимание эмоций своих и других',
+          suggestedActivities: ['Театральный кружок', 'Книжный клуб'],
+          progress: 55
+        }
+      ],
+      milestones: [
+        { title: 'Первый сольный танец', completed: true, date: 'Сентябрь 2025' },
+        { title: 'Выставка рисунков в школе', completed: true, date: 'Октябрь 2025' },
+        { title: 'Участие в новогоднем концерте', completed: false, date: 'Декабрь 2025' }
+      ]
+    }
+  ]);
 
   const [mealVotings, setMealVotings] = useState<MealVoting[]>([
     {
@@ -653,6 +900,10 @@ export default function Index() {
             <TabsTrigger value="meals" className="text-sm lg:text-base py-3">
               <Icon name="ChefHat" className="mr-1 lg:mr-2" size={16} />
               Меню
+            </TabsTrigger>
+            <TabsTrigger value="development" className="text-sm lg:text-base py-3">
+              <Icon name="GraduationCap" className="mr-1 lg:mr-2" size={16} />
+              Развитие
             </TabsTrigger>
             <TabsTrigger value="community" className="text-sm lg:text-base py-3">
               <Icon name="BookOpen" className="mr-1 lg:mr-2" size={16} />
@@ -1409,6 +1660,290 @@ export default function Index() {
                 </Card>
               ))}
             </div>
+          </TabsContent>
+
+          <TabsContent value="development" className="space-y-4">
+            <Card className="border-indigo-200 bg-gradient-to-br from-indigo-50 to-purple-50">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-2xl flex items-center gap-2">
+                      <Icon name="GraduationCap" className="text-indigo-600" size={28} />
+                      Развитие детей
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">Персональные планы развития на основе интересов и способностей</p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue={developmentPlans[0]?.childId} className="space-y-4">
+                  <TabsList className="grid w-full grid-cols-2">
+                    {developmentPlans.map(plan => (
+                      <TabsTrigger key={plan.childId} value={plan.childId} className="flex items-center gap-2">
+                        <span className="text-2xl">{familyMembers.find(m => m.id === plan.childId)?.avatar}</span>
+                        {plan.childName}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+
+                  {developmentPlans.map(plan => (
+                    <TabsContent key={plan.childId} value={plan.childId} className="space-y-4">
+                      <Card className="bg-white border-2 border-indigo-200">
+                        <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="flex items-center gap-2">
+                              <Icon name="User" className="text-indigo-600" size={22} />
+                              Профиль ребёнка
+                            </CardTitle>
+                            <Button variant="outline" size="sm">
+                              <Icon name="Edit" className="mr-2" size={14} />
+                              Редактировать анкету
+                            </Button>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                              <div>
+                                <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                                  <Icon name="Heart" size={16} className="text-red-500" />
+                                  Интересы
+                                </h4>
+                                <div className="flex gap-2 flex-wrap">
+                                  {plan.profile.interests.map((interest, idx) => (
+                                    <Badge key={idx} variant="secondary">{interest}</Badge>
+                                  ))}
+                                </div>
+                              </div>
+                              <div>
+                                <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                                  <Icon name="Star" size={16} className="text-yellow-500" />
+                                  Сильные стороны
+                                </h4>
+                                <div className="flex gap-2 flex-wrap">
+                                  {plan.profile.strengths.map((strength, idx) => (
+                                    <Badge key={idx} className="bg-yellow-100 text-yellow-800 border-yellow-300">{strength}</Badge>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="space-y-4">
+                              <div>
+                                <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                                  <Icon name="Target" size={16} className="text-green-500" />
+                                  Цели
+                                </h4>
+                                <ul className="space-y-2">
+                                  {plan.profile.goals.map((goal, idx) => (
+                                    <li key={idx} className="flex items-start gap-2 text-sm">
+                                      <Icon name="Check" size={14} className="text-green-600 mt-0.5 flex-shrink-0" />
+                                      {goal}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                              <div>
+                                <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                                  <Icon name="Sparkles" size={16} className="text-purple-500" />
+                                  Тип личности
+                                </h4>
+                                <p className="text-sm text-muted-foreground">{plan.profile.personality}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="bg-white border-2 border-indigo-200">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Icon name="Calendar" className="text-indigo-600" size={22} />
+                            Расписание кружков
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-3">
+                            {plan.schedule.map((activity, idx) => (
+                              <Card key={activity.id} className={`${activity.color} border-2 animate-fade-in`} style={{ animationDelay: `${idx * 0.05}s` }}>
+                                <CardContent className="p-4">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-3 mb-2">
+                                        <h4 className="font-semibold">{activity.name}</h4>
+                                        <Badge variant="outline" className="text-xs">{activity.category}</Badge>
+                                      </div>
+                                      <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+                                        <div className="flex items-center gap-1">
+                                          <Icon name="Calendar" size={12} />
+                                          {activity.dayOfWeek}
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <Icon name="Clock" size={12} />
+                                          {activity.time}
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <Icon name="Timer" size={12} />
+                                          {activity.duration}
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <Icon name="MapPin" size={12} />
+                                          {activity.location}
+                                        </div>
+                                      </div>
+                                      <div className="mt-2 text-xs text-muted-foreground">
+                                        Преподаватель: {activity.instructor}
+                                      </div>
+                                    </div>
+                                    <Button variant="ghost" size="sm">
+                                      <Icon name="MoreVertical" size={16} />
+                                    </Button>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                          <Button className="w-full mt-4 bg-gradient-to-r from-indigo-500 to-purple-500">
+                            <Icon name="Plus" className="mr-2" size={16} />
+                            Добавить кружок
+                          </Button>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="bg-white border-2 border-indigo-200">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Icon name="TrendingUp" className="text-indigo-600" size={22} />
+                            Развиваемые навыки
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            {plan.skills.map((skill, idx) => (
+                              <Card 
+                                key={skill.id} 
+                                className={`animate-fade-in ${
+                                  skill.importance === 'high' ? 'border-l-4 border-l-red-500' :
+                                  skill.importance === 'medium' ? 'border-l-4 border-l-yellow-500' :
+                                  'border-l-4 border-l-green-500'
+                                }`}
+                                style={{ animationDelay: `${idx * 0.05}s` }}
+                              >
+                                <CardContent className="p-4">
+                                  <div className="space-y-3">
+                                    <div className="flex items-start justify-between">
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <h4 className="font-semibold">{skill.skillName}</h4>
+                                          <Badge variant="outline" className="text-xs">{skill.category}</Badge>
+                                          {skill.importance === 'high' && (
+                                            <Badge className="bg-red-100 text-red-800 border-red-300 text-xs">Приоритет</Badge>
+                                          )}
+                                        </div>
+                                        <p className="text-sm text-muted-foreground">{skill.description}</p>
+                                      </div>
+                                    </div>
+
+                                    <div>
+                                      <div className="flex items-center justify-between mb-1">
+                                        <span className="text-xs font-medium">Прогресс</span>
+                                        <span className="text-xs font-bold text-indigo-600">{skill.progress}%</span>
+                                      </div>
+                                      <Progress value={skill.progress} className="h-2" />
+                                    </div>
+
+                                    <div>
+                                      <p className="text-xs font-semibold mb-2">Рекомендуемые активности:</p>
+                                      <div className="flex gap-2 flex-wrap">
+                                        {skill.suggestedActivities.map((activity, aIdx) => (
+                                          <Badge key={aIdx} variant="secondary" className="text-xs">{activity}</Badge>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="bg-white border-2 border-indigo-200">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Icon name="Award" className="text-indigo-600" size={22} />
+                            Достижения и вехи
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-3">
+                            {plan.milestones.map((milestone, idx) => (
+                              <div 
+                                key={idx}
+                                className={`flex items-center gap-3 p-3 rounded-lg border-2 transition-all ${
+                                  milestone.completed 
+                                    ? 'bg-green-50 border-green-300' 
+                                    : 'bg-gray-50 border-gray-300'
+                                }`}
+                              >
+                                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                                  milestone.completed ? 'bg-green-500' : 'bg-gray-300'
+                                }`}>
+                                  {milestone.completed ? (
+                                    <Icon name="Check" size={18} className="text-white" />
+                                  ) : (
+                                    <Icon name="Clock" size={18} className="text-white" />
+                                  )}
+                                </div>
+                                <div className="flex-1">
+                                  <p className={`font-medium text-sm ${milestone.completed ? 'line-through text-muted-foreground' : ''}`}>
+                                    {milestone.title}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">{milestone.date}</p>
+                                </div>
+                                {milestone.completed && (
+                                  <div className="text-2xl">🎉</div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="bg-gradient-to-br from-indigo-100 to-purple-100 border-2 border-indigo-300">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2 text-lg">
+                            <Icon name="Lightbulb" className="text-indigo-600" size={20} />
+                            Рекомендации экспертов
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-3">
+                            <div className="bg-white rounded-lg p-4 border border-indigo-200">
+                              <div className="flex items-start gap-3">
+                                <Icon name="MessageCircle" className="text-indigo-600 flex-shrink-0 mt-1" size={18} />
+                                <div>
+                                  <p className="text-sm font-medium mb-1">На основе профиля {plan.childName}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {plan.childId === '3' 
+                                      ? 'Рекомендуем добавить шахматы для развития стратегического мышления и участие в командных проектах для улучшения социальных навыков.'
+                                      : 'Отличный баланс творческих активностей! Рекомендуем добавить театральный кружок для развития уверенности в себе и публичных выступлений.'
+                                    }
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            <Button variant="outline" className="w-full">
+                              <Icon name="FileText" className="mr-2" size={16} />
+                              Показать полный отчёт
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+                  ))}
+                </Tabs>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
