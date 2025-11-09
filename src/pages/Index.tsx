@@ -312,51 +312,53 @@ export default function Index() {
         </Card>
 
         <header className="text-center mb-8 relative">
-          <div className="absolute top-0 right-4">
-            <Button
-              onClick={() => setShowThemeSelector(!showThemeSelector)}
-              className="bg-gradient-to-r from-indigo-500 to-purple-600"
-              size="sm"
-            >
-              <Icon name="Palette" className="mr-2" size={16} />
-              Стиль: {themes[currentTheme].name}
-            </Button>
-            
-            {showThemeSelector && (
-              <Card className="absolute right-0 top-12 z-50 w-80 border-2 border-indigo-300 shadow-2xl animate-fade-in">
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Icon name="Palette" size={20} />
-                    Выберите стиль оформления
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {(Object.keys(themes) as ThemeType[]).map((themeKey) => {
-                    const theme = themes[themeKey];
-                    return (
-                      <button
-                        key={themeKey}
-                        onClick={() => handleThemeChange(themeKey)}
-                        className={`w-full text-left p-4 rounded-lg border-2 transition-all hover:shadow-lg ${
-                          currentTheme === themeKey 
-                            ? 'border-indigo-500 bg-indigo-50' 
-                            : 'border-gray-200 hover:border-indigo-300'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-bold">{theme.name}</h4>
-                          {currentTheme === themeKey && (
-                            <Icon name="Check" className="text-indigo-600" size={20} />
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-1">{theme.description}</p>
-                        <Badge variant="outline" className="text-xs">{theme.ageRange}</Badge>
-                      </button>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-            )}
+          <div className="flex justify-center items-start mb-4 lg:mb-0">
+            <div className="lg:absolute lg:top-0 lg:right-4">
+              <Button
+                onClick={() => setShowThemeSelector(!showThemeSelector)}
+                className="bg-gradient-to-r from-indigo-500 to-purple-600"
+                size="sm"
+              >
+                <Icon name="Palette" className="mr-2" size={16} />
+                Стиль: {themes[currentTheme].name}
+              </Button>
+              
+              {showThemeSelector && (
+                <Card className="absolute right-0 top-12 z-50 w-80 max-w-[calc(100vw-2rem)] border-2 border-indigo-300 shadow-2xl animate-fade-in">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Icon name="Palette" size={20} />
+                      Выберите стиль оформления
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {(Object.keys(themes) as ThemeType[]).map((themeKey) => {
+                      const theme = themes[themeKey];
+                      return (
+                        <button
+                          key={themeKey}
+                          onClick={() => handleThemeChange(themeKey)}
+                          className={`w-full text-left p-4 rounded-lg border-2 transition-all hover:shadow-lg ${
+                            currentTheme === themeKey 
+                              ? 'border-indigo-500 bg-indigo-50' 
+                              : 'border-gray-200 hover:border-indigo-300'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-bold">{theme.name}</h4>
+                            {currentTheme === themeKey && (
+                              <Icon name="Check" className="text-indigo-600" size={20} />
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-1">{theme.description}</p>
+                          <Badge variant="outline" className="text-xs">{theme.ageRange}</Badge>
+                        </button>
+                      );
+                    })}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
 
           <h1 className={`${themeClasses.headingFont} font-bold bg-gradient-to-r ${themeClasses.primaryGradient.replace('bg-gradient-to-r ', '')} bg-clip-text text-transparent mb-4 animate-fade-in`}>
