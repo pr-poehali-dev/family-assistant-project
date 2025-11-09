@@ -1853,7 +1853,7 @@ export default function Index() {
                           };
 
                           const years = member.deathDate 
-                            ? `${birthDate.split('-')[0]} - ${member.deathDate.split('-')[0]}`
+                            ? `${member.birthDate.split('-')[0]} - ${member.deathDate.split('-')[0]}`
                             : `${member.birthDate.split('-')[0]} - н.в.`;
 
                           const age = member.age || calculateAge(member.birthDate, member.deathDate);
