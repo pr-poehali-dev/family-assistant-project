@@ -178,6 +178,21 @@ interface FamilyNeed {
   dueDate?: string;
 }
 
+interface CalendarEvent {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  createdBy: string;
+  createdByName: string;
+  createdByAvatar: string;
+  visibility: 'family' | 'private';
+  category: string;
+  color: string;
+  attendees?: string[];
+}
+
 export default function Index() {
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([
     { 
@@ -886,6 +901,128 @@ export default function Index() {
     }
   ]);
 
+  const getWeekDays = () => {
+    const today = new Date();
+    const days = [];
+    const currentDay = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (currentDay === 0 ? 6 : currentDay - 1));
+    
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(monday);
+      day.setDate(monday.getDate() + i);
+      days.push({
+        date: day.getDate(),
+        month: day.getMonth() + 1,
+        year: day.getFullYear(),
+        dayName: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'][day.getDay()],
+        fullDate: day.toISOString().split('T')[0],
+        isToday: day.toDateString() === today.toDateString()
+      });
+    }
+    return days;
+  };
+
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([
+    {
+      id: '1',
+      title: 'Семейный ужин',
+      description: 'Ужин вместе всей семьёй',
+      date: getWeekDays()[1].fullDate,
+      time: '19:00',
+      createdBy: '2',
+      createdByName: 'Елена',
+      createdByAvatar: '👩',
+      visibility: 'family',
+      category: 'Семья',
+      color: 'bg-orange-100 border-orange-300',
+      attendees: ['1', '2', '3', '4', '5', '6']
+    },
+    {
+      id: '2',
+      title: 'Встреча с друзьями',
+      description: 'Кофе с подругами',
+      date: getWeekDays()[2].fullDate,
+      time: '15:00',
+      createdBy: '2',
+      createdByName: 'Елена',
+      createdByAvatar: '👩',
+      visibility: 'private',
+      category: 'Личное',
+      color: 'bg-purple-100 border-purple-300'
+    },
+    {
+      id: '3',
+      title: 'Робототехника',
+      description: 'Кружок Максима',
+      date: getWeekDays()[1].fullDate,
+      time: '16:00',
+      createdBy: '3',
+      createdByName: 'Максим',
+      createdByAvatar: '👦',
+      visibility: 'family',
+      category: 'Кружки',
+      color: 'bg-blue-100 border-blue-300',
+      attendees: ['3']
+    },
+    {
+      id: '4',
+      title: 'Рабочее совещание',
+      description: 'Важная встреча',
+      date: getWeekDays()[3].fullDate,
+      time: '10:00',
+      createdBy: '1',
+      createdByName: 'Александр',
+      createdByAvatar: '👨',
+      visibility: 'private',
+      category: 'Работа',
+      color: 'bg-gray-100 border-gray-300'
+    },
+    {
+      id: '5',
+      title: 'Танцы',
+      description: 'Занятие Софии',
+      date: getWeekDays()[4].fullDate,
+      time: '17:30',
+      createdBy: '4',
+      createdByName: 'София',
+      createdByAvatar: '👧',
+      visibility: 'family',
+      category: 'Кружки',
+      color: 'bg-pink-100 border-pink-300',
+      attendees: ['4']
+    },
+    {
+      id: '6',
+      title: 'Поход в кино',
+      description: 'Смотрим новый мультфильм',
+      date: getWeekDays()[5].fullDate,
+      time: '18:00',
+      createdBy: '1',
+      createdByName: 'Александр',
+      createdByAvatar: '👨',
+      visibility: 'family',
+      category: 'Развлечения',
+      color: 'bg-green-100 border-green-300',
+      attendees: ['1', '2', '3', '4']
+    },
+    {
+      id: '7',
+      title: 'Пирог с бабушкой',
+      description: 'Учимся печь пирог',
+      date: getWeekDays()[6].fullDate,
+      time: '14:00',
+      createdBy: '5',
+      createdByName: 'Анна',
+      createdByAvatar: '👵',
+      visibility: 'family',
+      category: 'Семья',
+      color: 'bg-yellow-100 border-yellow-300',
+      attendees: ['4', '5']
+    }
+  ]);
+
+  const [selectedUserId] = useState('1');
   const [newMessage, setNewMessage] = useState('');
 
   const toggleTask = (taskId: string) => {
@@ -1054,6 +1191,15 @@ export default function Index() {
     return suggestedMeals;
   };
 
+  const getEventsForDay = (date: string) => {
+    return calendarEvents.filter(event => {
+      if (event.date !== date) return false;
+      if (event.visibility === 'family') return true;
+      if (event.visibility === 'private' && event.createdBy === selectedUserId) return true;
+      return false;
+    });
+  };
+
   const completedTasksCount = tasks.filter(t => t.completed).length;
   const completionRate = Math.round((completedTasksCount / tasks.length) * 100);
 
@@ -1204,6 +1350,133 @@ export default function Index() {
             </CardContent>
           </Card>
         </div>
+
+        <Card className="animate-fade-in border-indigo-200 bg-gradient-to-br from-indigo-50 to-blue-50 shadow-lg mb-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-2xl flex items-center gap-2">
+                <Icon name="Calendar" className="text-indigo-600" size={28} />
+                Календарь недели
+              </CardTitle>
+              <Button className="bg-gradient-to-r from-indigo-500 to-blue-500">
+                <Icon name="Plus" className="mr-2" size={16} />
+                Добавить событие
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-7 gap-2">
+              {getWeekDays().map((day, idx) => {
+                const dayEvents = getEventsForDay(day.fullDate);
+                return (
+                  <div 
+                    key={idx}
+                    className={`animate-fade-in ${
+                      day.isToday 
+                        ? 'bg-gradient-to-br from-indigo-100 to-blue-100 border-2 border-indigo-500' 
+                        : 'bg-white border border-gray-200'
+                    } rounded-lg p-3 hover:shadow-md transition-all`}
+                    style={{ animationDelay: `${idx * 0.05}s` }}
+                  >
+                    <div className="text-center mb-2">
+                      <div className="text-xs font-semibold text-muted-foreground">{day.dayName}</div>
+                      <div className={`text-2xl font-bold ${
+                        day.isToday ? 'text-indigo-600' : 'text-foreground'
+                      }`}>
+                        {day.date}
+                      </div>
+                      {day.isToday && (
+                        <Badge className="mt-1 bg-indigo-500 text-white text-xs">Сегодня</Badge>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2 min-h-[200px]">
+                      {dayEvents.length > 0 ? (
+                        dayEvents.map((event, eventIdx) => (
+                          <div 
+                            key={event.id}
+                            className={`${event.color} border-2 rounded-lg p-2 hover:scale-105 transition-all cursor-pointer animate-fade-in`}
+                            style={{ animationDelay: `${(idx * 0.05) + (eventIdx * 0.02)}s` }}
+                          >
+                            <div className="flex items-start gap-1 mb-1">
+                              <Icon name="Clock" size={10} className="text-muted-foreground mt-0.5 flex-shrink-0" />
+                              <span className="text-xs font-semibold">{event.time}</span>
+                            </div>
+                            <h4 className="font-semibold text-sm mb-1 line-clamp-2">{event.title}</h4>
+                            <div className="flex items-center justify-between gap-1">
+                              <Badge variant="outline" className="text-xs px-1 py-0">
+                                {event.category}
+                              </Badge>
+                              {event.visibility === 'family' ? (
+                                <Icon name="Users" size={12} className="text-muted-foreground" title="Видят все" />
+                              ) : (
+                                <Icon name="Lock" size={12} className="text-muted-foreground" title="Личное" />
+                              )}
+                            </div>
+                            <div className="mt-1 flex items-center gap-0.5">
+                              <span className="text-xs">{event.createdByAvatar}</span>
+                              <span className="text-xs text-muted-foreground truncate">{event.createdByName}</span>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-4">
+                          <Icon name="CalendarOff" size={24} className="text-muted-foreground mx-auto mb-1" />
+                          <p className="text-xs text-muted-foreground">Нет событий</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            <div className="mt-4 flex items-center justify-between">
+              <div className="flex items-center gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <Icon name="Users" size={16} className="text-indigo-600" />
+                  <span className="text-muted-foreground">Семейные события</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Icon name="Lock" size={16} className="text-purple-600" />
+                  <span className="text-muted-foreground">Личные события</span>
+                </div>
+              </div>
+              
+              <div className="text-sm text-muted-foreground">
+                Всего событий на неделе: <strong>{calendarEvents.filter(e => {
+                  const weekDates = getWeekDays().map(d => d.fullDate);
+                  return weekDates.includes(e.date) && (e.visibility === 'family' || e.createdBy === selectedUserId);
+                }).length}</strong>
+              </div>
+            </div>
+
+            <Card className="bg-gradient-to-br from-indigo-100 to-blue-100 border-2 border-indigo-300 mt-4">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Icon name="Info" className="text-indigo-600" size={20} />
+                  Как это работает?
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-indigo-500 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 font-semibold text-xs">1</div>
+                    <p><strong>Семейные события</strong> (иконка 👥) видят все члены семьи</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="bg-indigo-500 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 font-semibold text-xs">2</div>
+                    <p><strong>Личные события</strong> (иконка 🔒) видит только тот, кто их создал</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="bg-indigo-500 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 font-semibold text-xs">3</div>
+                    <p>Нажмите на событие, чтобы увидеть детали и список участников</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </CardContent>
+        </Card>
 
         <Tabs defaultValue="members" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 lg:grid-cols-11 h-auto lg:h-14">
