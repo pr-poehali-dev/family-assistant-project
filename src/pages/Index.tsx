@@ -166,6 +166,34 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-100 via-pink-100 to-purple-100 p-4 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
+        <Card className="border-2 border-blue-300 bg-gradient-to-r from-blue-50 to-cyan-50 animate-fade-in">
+          <CardContent className="py-6">
+            <div className="text-center mb-4">
+              <h3 className="text-xl font-bold mb-2">🚀 Помогите нам стать лучше!</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Это демо-проект семейного органайзера. Ваше мнение поможет понять, нужно ли развивать этот проект дальше.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button 
+                size="lg"
+                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
+              >
+                <Icon name="ThumbsUp" className="mr-2" size={20} />
+                Буду использовать этот проект
+              </Button>
+              <Button 
+                size="lg"
+                variant="destructive"
+                className="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
+              >
+                <Icon name="ThumbsDown" className="mr-2" size={20} />
+                Не интересно
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         <header className="text-center mb-8">
           <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-orange-600 via-pink-600 to-purple-600 bg-clip-text text-transparent mb-4 animate-fade-in">
             Семейный Органайзер
@@ -220,7 +248,7 @@ export default function Index() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <Tabs defaultValue="members" className="space-y-6">
-              <TabsList className="grid grid-cols-4 lg:grid-cols-8 gap-1 h-auto p-1 bg-white/50 backdrop-blur-sm">
+              <TabsList className="grid grid-cols-4 lg:grid-cols-10 gap-1 h-auto p-1 bg-white/50 backdrop-blur-sm">
                 <TabsTrigger value="members" className="text-sm lg:text-base py-3">
                   <Icon name="Users" className="mr-1 lg:mr-2" size={16} />
                   Семья
@@ -276,6 +304,14 @@ export default function Index() {
                 <TabsTrigger value="ai" className="text-sm lg:text-base py-3">
                   <Icon name="Sparkles" className="mr-1 lg:mr-2" size={16} />
                   ИИ Здоровье
+                </TabsTrigger>
+                <TabsTrigger value="feedback" className="text-sm lg:text-base py-3">
+                  <Icon name="MessageSquare" className="mr-1 lg:mr-2" size={16} />
+                  Отзывы
+                </TabsTrigger>
+                <TabsTrigger value="payment" className="text-sm lg:text-base py-3">
+                  <Icon name="CreditCard" className="mr-1 lg:mr-2" size={16} />
+                  Оплата
                 </TabsTrigger>
               </TabsList>
 

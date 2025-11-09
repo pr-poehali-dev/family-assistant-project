@@ -1496,6 +1496,326 @@ export function FamilyTabsContent({
           </CardContent>
         </Card>
       </TabsContent>
+      <TabsContent value="feedback" className="space-y-6">
+        <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+          <CardHeader>
+            <CardTitle className="text-3xl flex items-center gap-3">
+              <Icon name="MessageSquare" className="text-blue-600" size={32} />
+              Отзывы, Техподдержка, Предложения
+            </CardTitle>
+            <p className="text-muted-foreground mt-2">
+              Помогите нам улучшить проект! Ваше мнение очень важно для нас.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid md:grid-cols-3 gap-4">
+              <Card className="border-2 border-green-300 bg-green-50 hover:shadow-lg transition-all cursor-pointer">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Icon name="Star" className="text-green-600" size={24} />
+                    Отзыв
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Поделитесь своим опытом использования приложения
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-orange-300 bg-orange-50 hover:shadow-lg transition-all cursor-pointer">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Icon name="Headphones" className="text-orange-600" size={24} />
+                    Техподдержка
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Сообщите о проблеме или задайте вопрос
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-purple-300 bg-purple-50 hover:shadow-lg transition-all cursor-pointer">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Icon name="Lightbulb" className="text-purple-600" size={24} />
+                    Предложение
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Предложите новую функцию или улучшение
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="border-2 border-blue-300">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="PenTool" className="text-blue-600" size={20} />
+                  Форма обратной связи
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm font-semibold mb-2 block">Тип обращения *</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Button variant="outline" className="w-full">Отзыв</Button>
+                    <Button variant="outline" className="w-full">Поддержка</Button>
+                    <Button variant="outline" className="w-full">Предложение</Button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-semibold mb-2 block">Ваше имя *</label>
+                  <Input placeholder="Как к вам обращаться?" />
+                  <p className="text-xs text-muted-foreground mt-1">💡 Укажите имя, чтобы мы знали, как к вам обращаться</p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-semibold mb-2 block">Email (необязательно)</label>
+                  <Input type="email" placeholder="your@email.com" />
+                  <p className="text-xs text-muted-foreground mt-1">💡 Оставьте email, если хотите получить ответ</p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-semibold mb-2 block">Заголовок *</label>
+                  <Input placeholder="Кратко опишите суть" />
+                  <p className="text-xs text-muted-foreground mt-1">💡 Например: "Ошибка при добавлении задачи" или "Предлагаю добавить темную тему"</p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-semibold mb-2 block">Описание *</label>
+                  <textarea 
+                    className="w-full min-h-[120px] p-3 border rounded-md"
+                    placeholder="Подробно опишите ваше обращение..."
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    💡 <strong>Для отзыва:</strong> Что понравилось? Что можно улучшить?<br />
+                    💡 <strong>Для поддержки:</strong> Опишите проблему и шаги для её воспроизведения<br />
+                    💡 <strong>Для предложения:</strong> Какую функцию хотите видеть и зачем она нужна?
+                  </p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-semibold mb-2 block">Оценка (для отзыва)</label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <Icon key={star} name="Star" size={32} className="text-yellow-400 cursor-pointer hover:scale-110 transition-transform" />
+                    ))}
+                  </div>
+                </div>
+
+                <Button className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white" size="lg">
+                  <Icon name="Send" className="mr-2" size={16} />
+                  Отправить
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-blue-100 to-indigo-100 border-2 border-blue-300">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="Info" className="text-blue-600" size={20} />
+                  Почему это важно
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <p>• Ваши отзывы помогают нам понять, что работает хорошо, а что нужно улучшить</p>
+                <p>• Сообщения о проблемах помогают нам быстрее их исправить</p>
+                <p>• Ваши предложения могут стать новыми функциями в следующих версиях</p>
+                <p>• Все обращения будут рассмотрены в течение 24-48 часов</p>
+              </CardContent>
+            </Card>
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="payment" className="space-y-6">
+        <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50">
+          <CardHeader>
+            <CardTitle className="text-3xl flex items-center gap-3">
+              <Icon name="CreditCard" className="text-emerald-600" size={32} />
+              Подписка и оплата
+            </CardTitle>
+            <p className="text-muted-foreground mt-2">
+              Поддержите развитие проекта и получите доступ ко всем функциям
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card className="border-2 border-gray-300">
+                <CardHeader className="bg-gray-100">
+                  <CardTitle className="text-2xl">Бесплатная версия</CardTitle>
+                  <p className="text-muted-foreground">Попробуйте базовый функционал</p>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="text-center mb-6">
+                    <div className="text-5xl font-bold text-gray-700 mb-2">0 ₽</div>
+                    <p className="text-sm text-muted-foreground">Навсегда бесплатно</p>
+                  </div>
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center gap-2">
+                      <Icon name="Check" className="text-green-600" size={20} />
+                      <span className="text-sm">До 4 членов семьи</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Icon name="Check" className="text-green-600" size={20} />
+                      <span className="text-sm">Базовые задачи и календарь</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Icon name="Check" className="text-green-600" size={20} />
+                      <span className="text-sm">Семейный чат</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Icon name="X" className="text-gray-400" size={20} />
+                      <span className="text-sm text-muted-foreground">ИИ-рекомендации</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Icon name="X" className="text-gray-400" size={20} />
+                      <span className="text-sm text-muted-foreground">Семейное древо</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Icon name="X" className="text-gray-400" size={20} />
+                      <span className="text-sm text-muted-foreground">Приоритетная поддержка</span>
+                    </div>
+                  </div>
+                  <Button variant="outline" className="w-full" disabled>
+                    Текущий план
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-emerald-500 relative overflow-hidden">
+                <div className="absolute top-4 right-4">
+                  <Badge className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
+                    Рекомендуем
+                  </Badge>
+                </div>
+                <CardHeader className="bg-gradient-to-r from-emerald-100 to-teal-100">
+                  <CardTitle className="text-2xl">Годовая подписка</CardTitle>
+                  <p className="text-muted-foreground">Полный доступ ко всем функциям</p>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="text-center mb-6">
+                    <div className="text-5xl font-bold text-emerald-600 mb-2">800 ₽</div>
+                    <p className="text-sm text-muted-foreground">В год • Всего 67 ₽/мес</p>
+                  </div>
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center gap-2">
+                      <Icon name="Check" className="text-emerald-600" size={20} />
+                      <span className="text-sm font-semibold">Неограниченное количество членов</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Icon name="Check" className="text-emerald-600" size={20} />
+                      <span className="text-sm font-semibold">Все функции бесплатной версии</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Icon name="Check" className="text-emerald-600" size={20} />
+                      <span className="text-sm font-semibold">ИИ-рекомендации по здоровью</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Icon name="Check" className="text-emerald-600" size={20} />
+                      <span className="text-sm font-semibold">Семейное древо без ограничений</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Icon name="Check" className="text-emerald-600" size={20} />
+                      <span className="text-sm font-semibold">Планы развития детей</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Icon name="Check" className="text-emerald-600" size={20} />
+                      <span className="text-sm font-semibold">Приоритетная техподдержка</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Icon name="Check" className="text-emerald-600" size={20} />
+                      <span className="text-sm font-semibold">Резервное копирование данных</span>
+                    </div>
+                  </div>
+                  <Button className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white" size="lg">
+                    <Icon name="Sparkles" className="mr-2" size={16} />
+                    Оформить подписку
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="bg-gradient-to-br from-amber-100 to-yellow-100 border-2 border-amber-300">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="Gift" className="text-amber-600" size={24} />
+                  Специальное предложение
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm mb-4">
+                  <strong>Первым 100 подписчикам:</strong> Скидка 50% на первый год подписки! Вместо 800₽ - всего 400₽
+                </p>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Icon name="Clock" size={16} />
+                  <span>Предложение действует до 31 декабря 2025</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-blue-300">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="HelpCircle" className="text-blue-600" size={20} />
+                  Часто задаваемые вопросы
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h4 className="font-semibold mb-1">Как оплатить подписку?</h4>
+                  <p className="text-sm text-muted-foreground">
+                    После нажатия кнопки "Оформить подписку" вы будете перенаправлены на защищенную страницу оплаты. Принимаем карты всех банков.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-1">Можно ли отменить подписку?</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Да, вы можете отменить подписку в любой момент. При этом доступ к функциям сохранится до конца оплаченного периода.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-1">Безопасна ли оплата?</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Да, все платежи обрабатываются через защищенный платежный шлюз. Мы не храним данные ваших карт.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-1">Что будет с данными после окончания подписки?</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Все ваши данные сохраняются. Вы просто потеряете доступ к премиум-функциям, но базовый функционал останется доступным.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-emerald-100 to-teal-100 border-2 border-emerald-300">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="Heart" className="text-emerald-600" size={20} />
+                  Поддержите развитие проекта
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm space-y-2">
+                <p>Ваша подписка помогает нам:</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Разрабатывать новые функции</li>
+                  <li>Улучшать существующий функционал</li>
+                  <li>Обеспечивать быструю техподдержку</li>
+                  <li>Поддерживать серверы и инфраструктуру</li>
+                  <li>Создавать качественный продукт для семей</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </CardContent>
+        </Card>
+      </TabsContent>
     </>
   );
 }

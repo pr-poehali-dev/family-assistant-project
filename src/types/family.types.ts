@@ -264,3 +264,26 @@ export interface AIRecommendation {
   warnings?: string[];
   tips?: string[];
 }
+
+export interface Feedback {
+  id: string;
+  type: 'review' | 'support' | 'suggestion';
+  userName: string;
+  userEmail?: string;
+  title: string;
+  description: string;
+  rating?: number;
+  status: 'new' | 'in_progress' | 'resolved';
+  createdAt: string;
+  category?: string;
+}
+
+export interface PaymentInfo {
+  userId: string;
+  userName: string;
+  subscriptionType: 'free' | 'annual';
+  price: number;
+  expiryDate?: string;
+  isPaid: boolean;
+  paymentDate?: string;
+}
