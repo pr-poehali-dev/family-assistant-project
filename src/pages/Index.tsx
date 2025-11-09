@@ -69,6 +69,7 @@ export default function Index() {
     return (saved as ThemeType) || 'middle';
   });
   const [showThemeSelector, setShowThemeSelector] = useState(false);
+  const [showProjectInfo, setShowProjectInfo] = useState(false);
 
   useEffect(() => {
     const newReminders: Reminder[] = tasks
@@ -82,6 +83,21 @@ export default function Index() {
       }));
     setReminders(newReminders);
   }, [tasks]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowProjectInfo(true);
+    }, 1500);
+
+    const hideTimer = setTimeout(() => {
+      setShowProjectInfo(false);
+    }, 8000);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(hideTimer);
+    };
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -361,9 +377,29 @@ export default function Index() {
             </div>
           </div>
 
-          <h1 className={`${themeClasses.headingFont} font-bold bg-gradient-to-r ${themeClasses.primaryGradient.replace('bg-gradient-to-r ', '')} bg-clip-text text-transparent mb-4 animate-fade-in`}>
-            Семейный Органайзер
-          </h1>
+          <div className="relative inline-block">
+            <h1 className={`${themeClasses.headingFont} font-bold bg-gradient-to-r ${themeClasses.primaryGradient.replace('bg-gradient-to-r ', '')} bg-clip-text text-transparent mb-4 animate-fade-in`}>
+              Семейный Органайзер
+            </h1>
+            
+            {showProjectInfo && (
+              <Card className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 z-50 w-80 max-w-[calc(100vw-2rem)] border-2 border-blue-300 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-2xl animate-fade-in">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <Icon name="Target" className="text-blue-600 flex-shrink-0 mt-1" size={24} />
+                    <div>
+                      <h3 className="font-bold text-blue-900 mb-2">Цель проекта:</h3>
+                      <p className="text-sm text-blue-800 leading-relaxed">
+                        Сохранение семейных ценностей, повышение вовлеченности в семейную жизнь, 
+                        бережная передача семейных традиций и истории семьи
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+          
           <p className="text-lg lg:text-xl text-muted-foreground animate-fade-in" style={{ animationDelay: '0.2s' }}>
             Управление семейной жизнью с AI-помощником
           </p>
