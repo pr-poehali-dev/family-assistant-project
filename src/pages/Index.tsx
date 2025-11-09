@@ -18,6 +18,11 @@ interface FamilyMember {
   points: number;
   level: number;
   achievements: string[];
+  foodPreferences?: {
+    favorites: string[];
+    dislikes: string[];
+  };
+  responsibilities?: string[];
 }
 
 interface Task {
@@ -136,12 +141,135 @@ interface DevelopmentPlan {
   milestones: { title: string; completed: boolean; date: string }[];
 }
 
+interface ChatMessage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderAvatar: string;
+  content: string;
+  timestamp: string;
+  type: 'text' | 'image' | 'video' | 'document';
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: string;
+}
+
+interface FamilyAlbum {
+  id: string;
+  fileName: string;
+  fileUrl: string;
+  uploadedBy: string;
+  uploadDate: string;
+  type: 'image' | 'video';
+}
+
+interface FamilyNeed {
+  id: string;
+  title: string;
+  description: string;
+  createdBy: string;
+  createdByName: string;
+  assignedTo: string;
+  assignedToName: string;
+  category: string;
+  priority: 'low' | 'medium' | 'high';
+  status: 'pending' | 'in_progress' | 'completed';
+  createdAt: string;
+  dueDate?: string;
+}
+
 export default function Index() {
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([
-    { id: '1', name: 'Александр', role: 'Муж', workload: 65, avatar: '👨', points: 450, level: 5, achievements: ['early_bird', 'helper', 'chef'] },
-    { id: '2', name: 'Елена', role: 'Жена', workload: 75, avatar: '👩', points: 680, level: 7, achievements: ['organizer', 'champion', 'master_chef'] },
-    { id: '3', name: 'Максим', role: 'Сын', workload: 30, avatar: '👦', points: 210, level: 3, achievements: ['student', 'helper'] },
-    { id: '4', name: 'София', role: 'Дочь', workload: 25, avatar: '👧', points: 150, level: 2, achievements: ['beginner'] }
+    { 
+      id: '1', 
+      name: 'Александр', 
+      role: 'Муж', 
+      workload: 65, 
+      avatar: '👨', 
+      points: 450, 
+      level: 5, 
+      achievements: ['early_bird', 'helper', 'chef'],
+      foodPreferences: {
+        favorites: ['Стейк', 'Паста карбонара', 'Борщ', 'Блины'],
+        dislikes: ['Баклажаны', 'Оливки', 'Грибы']
+      },
+      responsibilities: ['Покупки', 'Вынести мусор', 'Мелкий ремонт']
+    },
+    { 
+      id: '2', 
+      name: 'Елена', 
+      role: 'Жена', 
+      workload: 75, 
+      avatar: '👩', 
+      points: 680, 
+      level: 7, 
+      achievements: ['organizer', 'champion', 'master_chef'],
+      foodPreferences: {
+        favorites: ['Салаты', 'Рыба', 'Овощи на гриле', 'Суши'],
+        dislikes: ['Жирное мясо', 'Майонез', 'Фастфуд']
+      },
+      responsibilities: ['Готовка', 'Стирка', 'Уборка']
+    },
+    { 
+      id: '3', 
+      name: 'Максим', 
+      role: 'Сын', 
+      workload: 30, 
+      avatar: '👦', 
+      points: 210, 
+      level: 3, 
+      achievements: ['student', 'helper'],
+      foodPreferences: {
+        favorites: ['Пицца', 'Бургеры', 'Пельмени', 'Мороженое'],
+        dislikes: ['Брокколи', 'Рыба', 'Лук']
+      },
+      responsibilities: ['Уроки', 'Убрать комнату']
+    },
+    { 
+      id: '4', 
+      name: 'София', 
+      role: 'Дочь', 
+      workload: 25, 
+      avatar: '👧', 
+      points: 150, 
+      level: 2, 
+      achievements: ['beginner'],
+      foodPreferences: {
+        favorites: ['Макароны с сыром', 'Блинчики', 'Фрукты', 'Йогурт'],
+        dislikes: ['Острое', 'Горькое', 'Печень']
+      },
+      responsibilities: ['Убрать игрушки', 'Полить цветы']
+    },
+    { 
+      id: '5', 
+      name: 'Анна', 
+      role: 'Бабушка', 
+      workload: 20, 
+      avatar: '👵', 
+      points: 320, 
+      level: 4, 
+      achievements: ['wise', 'cook'],
+      foodPreferences: {
+        favorites: ['Домашние пироги', 'Супы', 'Каши', 'Компот'],
+        dislikes: ['Острые блюда', 'Экзотическая еда']
+      },
+      responsibilities: ['Выпечка', 'Присмотр за детьми']
+    },
+    { 
+      id: '6', 
+      name: 'Виктор', 
+      role: 'Дедушка', 
+      workload: 15, 
+      avatar: '👴', 
+      points: 280, 
+      level: 3, 
+      achievements: ['gardener', 'storyteller'],
+      foodPreferences: {
+        favorites: ['Холодец', 'Квашеная капуста', 'Мясные блюда'],
+        dislikes: ['Слишком сладкое', 'Полуфабрикаты']
+      },
+      responsibilities: ['Садоводство', 'Помощь с ремонтом']
+    }
   ]);
 
   const [tasks, setTasks] = useState<Task[]>([
@@ -639,6 +767,127 @@ export default function Index() {
     }
   ]);
 
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+    {
+      id: '1',
+      senderId: '2',
+      senderName: 'Елена',
+      senderAvatar: '👩',
+      content: 'Не забудьте, сегодня вечером семейный ужин!',
+      timestamp: '10:30',
+      type: 'text'
+    },
+    {
+      id: '2',
+      senderId: '1',
+      senderName: 'Александр',
+      senderAvatar: '👨',
+      content: 'Куплю продукты по дороге домой',
+      timestamp: '11:15',
+      type: 'text'
+    },
+    {
+      id: '3',
+      senderId: '3',
+      senderName: 'Максим',
+      senderAvatar: '👦',
+      content: 'Смотрите, какого робота я собрал!',
+      timestamp: '14:20',
+      type: 'image',
+      fileUrl: '/placeholder.jpg',
+      fileName: 'robot.jpg'
+    },
+    {
+      id: '4',
+      senderId: '4',
+      senderName: 'София',
+      senderAvatar: '👧',
+      content: 'Мой рисунок с кружка',
+      timestamp: '15:45',
+      type: 'image',
+      fileUrl: '/placeholder.jpg',
+      fileName: 'drawing.jpg'
+    }
+  ]);
+
+  const [familyAlbum, setFamilyAlbum] = useState<FamilyAlbum[]>([
+    {
+      id: '1',
+      fileName: 'robot.jpg',
+      fileUrl: '/placeholder.jpg',
+      uploadedBy: 'Максим',
+      uploadDate: '2024-11-08',
+      type: 'image'
+    },
+    {
+      id: '2',
+      fileName: 'drawing.jpg',
+      fileUrl: '/placeholder.jpg',
+      uploadedBy: 'София',
+      uploadDate: '2024-11-08',
+      type: 'image'
+    }
+  ]);
+
+  const [familyNeeds, setFamilyNeeds] = useState<FamilyNeed[]>([
+    {
+      id: '1',
+      title: 'Постирать школьную форму',
+      description: 'Максиму нужна чистая форма к понедельнику',
+      createdBy: '3',
+      createdByName: 'Максим',
+      assignedTo: '2',
+      assignedToName: 'Елена',
+      category: 'Стирка',
+      priority: 'high',
+      status: 'pending',
+      createdAt: '2024-11-08 09:00',
+      dueDate: '2024-11-10'
+    },
+    {
+      id: '2',
+      title: 'Заказать продукты на неделю',
+      description: 'Молоко, хлеб, овощи, фрукты, курица',
+      createdBy: '2',
+      createdByName: 'Елена',
+      assignedTo: '1',
+      assignedToName: 'Александр',
+      category: 'Покупки',
+      priority: 'medium',
+      status: 'in_progress',
+      createdAt: '2024-11-08 10:30'
+    },
+    {
+      id: '3',
+      title: 'Помочь с математикой',
+      description: 'Нужна помощь с домашним заданием по геометрии',
+      createdBy: '3',
+      createdByName: 'Максим',
+      assignedTo: '1',
+      assignedToName: 'Александр',
+      category: 'Учёба',
+      priority: 'medium',
+      status: 'completed',
+      createdAt: '2024-11-07 16:00'
+    },
+    {
+      id: '4',
+      title: 'Испечь пирог к выходным',
+      description: 'Хотим яблочный пирог как у бабушки',
+      createdBy: '4',
+      createdByName: 'София',
+      assignedTo: '5',
+      assignedToName: 'Анна',
+      category: 'Готовка',
+      priority: 'low',
+      status: 'pending',
+      createdAt: '2024-11-08 12:00',
+      dueDate: '2024-11-09'
+    }
+  ]);
+
+  const [newMessage, setNewMessage] = useState('');
+
   const toggleTask = (taskId: string) => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
@@ -722,6 +971,87 @@ export default function Index() {
       case 'hard': return 'Сложно';
       default: return difficulty;
     }
+  };
+
+  const sendMessage = () => {
+    if (!newMessage.trim()) return;
+    
+    const message: ChatMessage = {
+      id: Date.now().toString(),
+      senderId: '1',
+      senderName: 'Александр',
+      senderAvatar: '👨',
+      content: newMessage,
+      timestamp: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+      type: 'text'
+    };
+    
+    setChatMessages([...chatMessages, message]);
+    setNewMessage('');
+  };
+
+  const handleFileUpload = (file: File, type: 'image' | 'video' | 'document') => {
+    const fileUrl = URL.createObjectURL(file);
+    
+    const message: ChatMessage = {
+      id: Date.now().toString(),
+      senderId: '1',
+      senderName: 'Александр',
+      senderAvatar: '👨',
+      content: type === 'image' ? 'Отправил фото' : type === 'video' ? 'Отправил видео' : 'Отправил документ',
+      timestamp: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+      type: type,
+      fileUrl: fileUrl,
+      fileName: file.name,
+      fileSize: `${(file.size / 1024 / 1024).toFixed(2)} MB`
+    };
+    
+    setChatMessages([...chatMessages, message]);
+    
+    if (type === 'image' || type === 'video') {
+      const albumItem: FamilyAlbum = {
+        id: Date.now().toString(),
+        fileName: file.name,
+        fileUrl: fileUrl,
+        uploadedBy: 'Александр',
+        uploadDate: new Date().toISOString().split('T')[0],
+        type: type
+      };
+      setFamilyAlbum([...familyAlbum, albumItem]);
+    }
+  };
+
+  const updateNeedStatus = (needId: string, status: 'pending' | 'in_progress' | 'completed') => {
+    setFamilyNeeds(needs => needs.map(need => 
+      need.id === needId ? { ...need, status } : need
+    ));
+  };
+
+  const getAISuggestedMeals = () => {
+    const allFavorites = familyMembers
+      .flatMap(m => m.foodPreferences?.favorites || []);
+    const allDislikes = familyMembers
+      .flatMap(m => m.foodPreferences?.dislikes || []);
+    
+    const suggestedMeals = [
+      {
+        name: 'Паста карбонара с салатом',
+        reason: 'Нравится Александру, Елена любит салаты',
+        avoidIngredients: allDislikes.slice(0, 2)
+      },
+      {
+        name: 'Рыба на гриле с овощами',
+        reason: 'Елена любит рыбу и овощи на гриле',
+        avoidIngredients: allDislikes.slice(2, 4)
+      },
+      {
+        name: 'Домашняя пицца',
+        reason: 'Любимое блюдо Максима, можно добавить разные топпинги для всех',
+        avoidIngredients: ['Брокколи', 'Лук']
+      }
+    ];
+    
+    return suggestedMeals;
   };
 
   const completedTasksCount = tasks.filter(t => t.completed).length;
@@ -876,7 +1206,7 @@ export default function Index() {
         </div>
 
         <Tabs defaultValue="members" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 h-auto lg:h-14">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-11 h-auto lg:h-14">
             <TabsTrigger value="members" className="text-sm lg:text-base py-3">
               <Icon name="Users" className="mr-1 lg:mr-2" size={16} />
               Семья
@@ -884,6 +1214,18 @@ export default function Index() {
             <TabsTrigger value="tasks" className="text-sm lg:text-base py-3">
               <Icon name="CheckSquare" className="mr-1 lg:mr-2" size={16} />
               Задачи
+            </TabsTrigger>
+            <TabsTrigger value="chat" className="text-sm lg:text-base py-3">
+              <Icon name="MessageCircle" className="mr-1 lg:mr-2" size={16} />
+              Чат
+            </TabsTrigger>
+            <TabsTrigger value="album" className="text-sm lg:text-base py-3">
+              <Icon name="Image" className="mr-1 lg:mr-2" size={16} />
+              Альбом
+            </TabsTrigger>
+            <TabsTrigger value="needs" className="text-sm lg:text-base py-3">
+              <Icon name="ListTodo" className="mr-1 lg:mr-2" size={16} />
+              Потребности
             </TabsTrigger>
             <TabsTrigger value="rating" className="text-sm lg:text-base py-3">
               <Icon name="Trophy" className="mr-1 lg:mr-2" size={16} />
@@ -1464,6 +1806,101 @@ export default function Index() {
                 </div>
               </CardHeader>
               <CardContent>
+                <Card className="bg-gradient-to-br from-green-100 to-emerald-100 border-2 border-green-300 mb-6">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Icon name="Sparkles" className="text-green-600" size={20} />
+                      ИИ рекомендации на основе предпочтений семьи
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {getAISuggestedMeals().map((meal, idx) => (
+                        <Card key={idx} className="bg-white border border-green-200 animate-fade-in" style={{ animationDelay: `${idx * 0.05}s` }}>
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex-1">
+                                <h4 className="font-semibold text-green-800">{meal.name}</h4>
+                                <p className="text-sm text-muted-foreground mt-1">{meal.reason}</p>
+                              </div>
+                              <Button variant="outline" size="sm" className="ml-2">
+                                <Icon name="Plus" className="mr-1" size={14} />
+                                Добавить
+                              </Button>
+                            </div>
+                            {meal.avoidIngredients.length > 0 && (
+                              <div className="flex items-center gap-2 mt-2">
+                                <Icon name="AlertCircle" size={14} className="text-orange-500" />
+                                <span className="text-xs text-muted-foreground">
+                                  Избегать: {meal.avoidIngredients.join(', ')}
+                                </span>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                    <div className="mt-4 p-3 bg-white border border-green-200 rounded-lg">
+                      <p className="text-sm text-muted-foreground flex items-start gap-2">
+                        <Icon name="Info" size={16} className="text-green-600 flex-shrink-0 mt-0.5" />
+                        <span>ИИ анализирует любимые и нелюбимые продукты всех членов семьи и предлагает блюда, которые понравятся всем</span>
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <Icon name="Heart" className="text-red-500" size={20} />
+                    Пищевые предпочтения семьи
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {familyMembers.map(member => (
+                      <Card key={member.id} className="border-green-200">
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl">{member.avatar}</span>
+                            <div>
+                              <CardTitle className="text-base">{member.name}</CardTitle>
+                              <p className="text-xs text-muted-foreground">{member.role}</p>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-3">
+                            <div>
+                              <h4 className="text-xs font-semibold mb-1 flex items-center gap-1">
+                                <Icon name="ThumbsUp" size={12} className="text-green-600" />
+                                Любит:
+                              </h4>
+                              <div className="flex gap-1 flex-wrap">
+                                {member.foodPreferences?.favorites.map((food, idx) => (
+                                  <Badge key={idx} className="bg-green-100 text-green-800 border-green-300 text-xs">
+                                    {food}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <h4 className="text-xs font-semibold mb-1 flex items-center gap-1">
+                                <Icon name="ThumbsDown" size={12} className="text-red-600" />
+                                Не любит:
+                              </h4>
+                              <div className="flex gap-1 flex-wrap">
+                                {member.foodPreferences?.dislikes.map((food, idx) => (
+                                  <Badge key={idx} className="bg-red-100 text-red-800 border-red-300 text-xs">
+                                    {food}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="space-y-6">
                   {mealVotings.map((voting, vIndex) => (
                     <Card key={voting.id} className="animate-fade-in bg-white border-2 border-green-200" style={{ animationDelay: `${vIndex * 0.1}s` }}>
@@ -1942,6 +2379,420 @@ export default function Index() {
                     </TabsContent>
                   ))}
                 </Tabs>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="chat" className="space-y-4">
+            <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50">
+              <CardHeader>
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  <Icon name="MessageCircle" className="text-blue-600" size={28} />
+                  Семейный чат
+                </CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">Общайтесь, делитесь фото и видео с семьёй</p>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-white rounded-lg border-2 border-blue-200 overflow-hidden">
+                  <div className="h-[500px] overflow-y-auto p-4 space-y-3">
+                    {chatMessages.map((message, idx) => (
+                      <div 
+                        key={message.id}
+                        className={`flex items-start gap-3 animate-fade-in ${
+                          message.senderId === '1' ? 'flex-row-reverse' : ''
+                        }`}
+                        style={{ animationDelay: `${idx * 0.05}s` }}
+                      >
+                        <div className="text-3xl flex-shrink-0">{message.senderAvatar}</div>
+                        <div className={`flex-1 max-w-[70%] ${message.senderId === '1' ? 'items-end' : ''}`}>
+                          <p className="text-xs text-muted-foreground mb-1">
+                            {message.senderName} • {message.timestamp}
+                          </p>
+                          <div className={`rounded-lg p-3 ${
+                            message.senderId === '1' 
+                              ? 'bg-blue-500 text-white' 
+                              : 'bg-gray-100 text-gray-900'
+                          }`}>
+                            {message.type === 'text' && (
+                              <p className="text-sm">{message.content}</p>
+                            )}
+                            {message.type === 'image' && (
+                              <div className="space-y-2">
+                                <p className="text-sm">{message.content}</p>
+                                <div className="bg-white rounded p-2 flex items-center gap-2">
+                                  <Icon name="Image" size={16} className="text-blue-600" />
+                                  <span className="text-xs text-gray-600">{message.fileName}</span>
+                                </div>
+                              </div>
+                            )}
+                            {message.type === 'video' && (
+                              <div className="space-y-2">
+                                <p className="text-sm">{message.content}</p>
+                                <div className="bg-white rounded p-2 flex items-center gap-2">
+                                  <Icon name="Video" size={16} className="text-blue-600" />
+                                  <span className="text-xs text-gray-600">{message.fileName}</span>
+                                </div>
+                              </div>
+                            )}
+                            {message.type === 'document' && (
+                              <div className="space-y-2">
+                                <p className="text-sm">{message.content}</p>
+                                <div className="bg-white rounded p-2 flex items-center gap-2">
+                                  <Icon name="FileText" size={16} className="text-blue-600" />
+                                  <span className="text-xs text-gray-600">{message.fileName}</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="border-t-2 border-blue-200 p-4 bg-blue-50">
+                    <div className="flex gap-2 mb-3">
+                      <label className="cursor-pointer">
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          className="hidden" 
+                          onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'image')}
+                        />
+                        <Button variant="outline" size="sm" type="button">
+                          <Icon name="Image" className="mr-2" size={16} />
+                          Фото
+                        </Button>
+                      </label>
+                      <label className="cursor-pointer">
+                        <input 
+                          type="file" 
+                          accept="video/*" 
+                          className="hidden" 
+                          onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'video')}
+                        />
+                        <Button variant="outline" size="sm" type="button">
+                          <Icon name="Video" className="mr-2" size={16} />
+                          Видео
+                        </Button>
+                      </label>
+                      <label className="cursor-pointer">
+                        <input 
+                          type="file" 
+                          accept=".pdf,.doc,.docx,.txt" 
+                          className="hidden" 
+                          onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'document')}
+                        />
+                        <Button variant="outline" size="sm" type="button">
+                          <Icon name="FileText" className="mr-2" size={16} />
+                          Документ
+                        </Button>
+                      </label>
+                    </div>
+                    <div className="flex gap-2">
+                      <Input 
+                        placeholder="Напишите сообщение..." 
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                      />
+                      <Button onClick={sendMessage} className="bg-gradient-to-r from-blue-500 to-cyan-500">
+                        <Icon name="Send" size={18} />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="album" className="space-y-4">
+            <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-2xl flex items-center gap-2">
+                      <Icon name="Image" className="text-purple-600" size={28} />
+                      Семейный альбом
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">Все фото и видео из чата автоматически сохраняются здесь</p>
+                  </div>
+                  <label className="cursor-pointer">
+                    <input 
+                      type="file" 
+                      accept="image/*,video/*" 
+                      multiple
+                      className="hidden" 
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        files.forEach(file => {
+                          const type = file.type.startsWith('image/') ? 'image' : 'video';
+                          handleFileUpload(file, type);
+                        });
+                      }}
+                    />
+                    <Button className="bg-gradient-to-r from-purple-500 to-pink-500">
+                      <Icon name="Upload" className="mr-2" size={16} />
+                      Загрузить
+                    </Button>
+                  </label>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {familyAlbum.map((item, idx) => (
+                    <Card 
+                      key={item.id}
+                      className="overflow-hidden hover:shadow-lg transition-all hover:scale-[1.02] animate-fade-in"
+                      style={{ animationDelay: `${idx * 0.05}s` }}
+                    >
+                      <div className="aspect-square bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center relative">
+                        {item.type === 'image' ? (
+                          <Icon name="Image" size={48} className="text-purple-400" />
+                        ) : (
+                          <Icon name="Video" size={48} className="text-pink-400" />
+                        )}
+                        <div className="absolute top-2 right-2">
+                          <Badge className="bg-white text-purple-600 border border-purple-300">
+                            {item.type === 'image' ? '📷' : '🎥'}
+                          </Badge>
+                        </div>
+                      </div>
+                      <CardContent className="p-3">
+                        <p className="text-xs font-medium truncate">{item.fileName}</p>
+                        <div className="flex items-center justify-between mt-2">
+                          <p className="text-xs text-muted-foreground">{item.uploadedBy}</p>
+                          <p className="text-xs text-muted-foreground">{item.uploadDate}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                {familyAlbum.length === 0 && (
+                  <div className="text-center py-12">
+                    <Icon name="ImageOff" size={48} className="text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">Пока нет фото и видео</p>
+                    <p className="text-sm text-muted-foreground mt-1">Отправьте фото или видео в чате, и они появятся здесь</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="needs" className="space-y-4">
+            <Card className="border-teal-200 bg-gradient-to-br from-teal-50 to-cyan-50">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-2xl flex items-center gap-2">
+                      <Icon name="ListTodo" className="text-teal-600" size={28} />
+                      Потребности семьи
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">Создавайте задачи и назначайте ответственных автоматически</p>
+                  </div>
+                  <Button className="bg-gradient-to-r from-teal-500 to-cyan-500">
+                    <Icon name="Plus" className="mr-2" size={16} />
+                    Добавить потребность
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="all" className="space-y-4">
+                  <TabsList className="grid w-full grid-cols-4">
+                    <TabsTrigger value="all">Все</TabsTrigger>
+                    <TabsTrigger value="pending">Ожидают</TabsTrigger>
+                    <TabsTrigger value="in_progress">В работе</TabsTrigger>
+                    <TabsTrigger value="completed">Выполнено</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="all" className="space-y-3">
+                    {familyNeeds.map((need, idx) => (
+                      <Card 
+                        key={need.id}
+                        className={`animate-fade-in border-l-4 ${
+                          need.priority === 'high' ? 'border-l-red-500' :
+                          need.priority === 'medium' ? 'border-l-yellow-500' :
+                          'border-l-green-500'
+                        }`}
+                        style={{ animationDelay: `${idx * 0.05}s` }}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h4 className="font-semibold">{need.title}</h4>
+                                <Badge variant="outline" className="text-xs">{need.category}</Badge>
+                                {need.priority === 'high' && (
+                                  <Badge className="bg-red-100 text-red-800 border-red-300 text-xs">
+                                    Срочно
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground mb-3">{need.description}</p>
+                              
+                              <div className="grid grid-cols-2 gap-3 text-sm">
+                                <div className="flex items-center gap-2">
+                                  <Icon name="User" size={14} className="text-muted-foreground" />
+                                  <span className="text-muted-foreground">Создал:</span>
+                                  <span className="font-medium">{need.createdByName}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Icon name="UserCheck" size={14} className="text-muted-foreground" />
+                                  <span className="text-muted-foreground">Ответственный:</span>
+                                  <span className="font-medium">{need.assignedToName}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Icon name="Clock" size={14} className="text-muted-foreground" />
+                                  <span className="text-muted-foreground">Создано:</span>
+                                  <span className="text-xs">{need.createdAt}</span>
+                                </div>
+                                {need.dueDate && (
+                                  <div className="flex items-center gap-2">
+                                    <Icon name="Calendar" size={14} className="text-muted-foreground" />
+                                    <span className="text-muted-foreground">Срок:</span>
+                                    <span className="text-xs">{need.dueDate}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            
+                            <div className="flex flex-col gap-2">
+                              <Badge 
+                                className={
+                                  need.status === 'completed' ? 'bg-green-100 text-green-800 border-green-300' :
+                                  need.status === 'in_progress' ? 'bg-blue-100 text-blue-800 border-blue-300' :
+                                  'bg-gray-100 text-gray-800 border-gray-300'
+                                }
+                              >
+                                {need.status === 'completed' && '✓ Выполнено'}
+                                {need.status === 'in_progress' && '⏳ В работе'}
+                                {need.status === 'pending' && '⏸ Ожидает'}
+                              </Badge>
+                              
+                              {need.status !== 'completed' && (
+                                <div className="flex flex-col gap-1">
+                                  {need.status === 'pending' && (
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={() => updateNeedStatus(need.id, 'in_progress')}
+                                    >
+                                      Начать
+                                    </Button>
+                                  )}
+                                  {need.status === 'in_progress' && (
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={() => updateNeedStatus(need.id, 'completed')}
+                                    >
+                                      Завершить
+                                    </Button>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </TabsContent>
+
+                  <TabsContent value="pending" className="space-y-3">
+                    {familyNeeds.filter(n => n.status === 'pending').map((need, idx) => (
+                      <Card 
+                        key={need.id}
+                        className="animate-fade-in border-l-4 border-l-gray-500"
+                        style={{ animationDelay: `${idx * 0.05}s` }}
+                      >
+                        <CardContent className="p-4">
+                          <h4 className="font-semibold mb-2">{need.title}</h4>
+                          <p className="text-sm text-muted-foreground">{need.description}</p>
+                          <div className="flex justify-between items-center mt-3">
+                            <span className="text-sm">Ответственный: <strong>{need.assignedToName}</strong></span>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => updateNeedStatus(need.id, 'in_progress')}
+                            >
+                              Начать
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </TabsContent>
+
+                  <TabsContent value="in_progress" className="space-y-3">
+                    {familyNeeds.filter(n => n.status === 'in_progress').map((need, idx) => (
+                      <Card 
+                        key={need.id}
+                        className="animate-fade-in border-l-4 border-l-blue-500"
+                        style={{ animationDelay: `${idx * 0.05}s` }}
+                      >
+                        <CardContent className="p-4">
+                          <h4 className="font-semibold mb-2">{need.title}</h4>
+                          <p className="text-sm text-muted-foreground">{need.description}</p>
+                          <div className="flex justify-between items-center mt-3">
+                            <span className="text-sm">Ответственный: <strong>{need.assignedToName}</strong></span>
+                            <Button 
+                              size="sm"
+                              onClick={() => updateNeedStatus(need.id, 'completed')}
+                              className="bg-green-500 hover:bg-green-600"
+                            >
+                              Завершить
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </TabsContent>
+
+                  <TabsContent value="completed" className="space-y-3">
+                    {familyNeeds.filter(n => n.status === 'completed').map((need, idx) => (
+                      <Card 
+                        key={need.id}
+                        className="animate-fade-in border-l-4 border-l-green-500 opacity-70"
+                        style={{ animationDelay: `${idx * 0.05}s` }}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Icon name="CheckCircle2" className="text-green-600" size={20} />
+                            <h4 className="font-semibold line-through">{need.title}</h4>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{need.description}</p>
+                          <div className="mt-3 text-sm">
+                            Выполнил: <strong>{need.assignedToName}</strong>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </TabsContent>
+                </Tabs>
+
+                <Card className="bg-gradient-to-br from-teal-100 to-cyan-100 border-2 border-teal-300 mt-6">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Icon name="Lightbulb" className="text-teal-600" size={20} />
+                      Как это работает?
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex items-start gap-3">
+                        <div className="bg-teal-500 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 font-semibold">1</div>
+                        <p>Любой член семьи создаёт потребность (постирать, купить продукты, помочь с уроками)</p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="bg-teal-500 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 font-semibold">2</div>
+                        <p>Система автоматически назначает задачу тому, в чьи обязанности это входит</p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="bg-teal-500 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 font-semibold">3</div>
+                        <p>Ответственный видит задачу, начинает работу и отмечает выполнение</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </CardContent>
             </Card>
           </TabsContent>
