@@ -9,7 +9,7 @@ export const themes: Record<ThemeType, ThemeConfig> = {
       primary: 'from-purple-500 via-pink-500 to-red-500',
       secondary: 'from-blue-400 to-cyan-400',
       accent: 'from-yellow-400 to-orange-500',
-      background: 'from-purple-100 via-pink-100 to-orange-100',
+      background: 'from-fuchsia-200 via-pink-200 to-rose-200',
       text: 'text-gray-900'
     },
     fontSize: {
@@ -28,7 +28,7 @@ export const themes: Record<ThemeType, ThemeConfig> = {
       primary: 'from-slate-600 to-slate-800',
       secondary: 'from-blue-600 to-indigo-700',
       accent: 'from-emerald-500 to-teal-600',
-      background: 'from-slate-50 to-gray-100',
+      background: 'from-slate-200 via-gray-200 to-zinc-200',
       text: 'text-slate-900'
     },
     fontSize: {
@@ -47,7 +47,7 @@ export const themes: Record<ThemeType, ThemeConfig> = {
       primary: 'from-blue-700 to-blue-900',
       secondary: 'from-emerald-600 to-green-700',
       accent: 'from-amber-500 to-orange-600',
-      background: 'from-blue-50 to-sky-100',
+      background: 'from-amber-100 via-yellow-100 to-lime-100',
       text: 'text-gray-950'
     },
     fontSize: {
@@ -66,7 +66,7 @@ export const themes: Record<ThemeType, ThemeConfig> = {
       primary: 'from-gray-800 to-black',
       secondary: 'from-blue-500 to-blue-600',
       accent: 'from-gray-400 to-gray-600',
-      background: 'from-white to-gray-50',
+      background: 'from-gray-100 via-slate-100 to-zinc-100',
       text: 'text-black'
     },
     fontSize: {
