@@ -56,6 +56,7 @@ interface FamilyTabsContentProps {
   getWorkloadColor: (workload: number) => string;
   getMemberById: (id: string) => FamilyMember | undefined;
   getAISuggestedMeals: () => { name: string; reason: string; icon: string }[];
+  exportStatsToCSV?: () => void;
 }
 
 export function FamilyTabsContent({
@@ -86,6 +87,7 @@ export function FamilyTabsContent({
   getWorkloadColor,
   getMemberById,
   getAISuggestedMeals,
+  exportStatsToCSV,
 }: FamilyTabsContentProps) {
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
@@ -1820,13 +1822,26 @@ export function FamilyTabsContent({
       <TabsContent value="stats" className="space-y-6">
         <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
           <CardHeader>
-            <CardTitle className="text-3xl flex items-center gap-3">
-              <Icon name="BarChart3" className="text-blue-600" size={32} />
-              Статистика проекта
-            </CardTitle>
-            <p className="text-muted-foreground mt-2">
-              Просмотр собранной статистики по обратной связи и использованию
-            </p>
+            <div className="flex items-start justify-between">
+              <div>
+                <CardTitle className="text-3xl flex items-center gap-3 mb-2">
+                  <Icon name="BarChart3" className="text-blue-600" size={32} />
+                  Статистика проекта
+                </CardTitle>
+                <p className="text-muted-foreground">
+                  Просмотр собранной статистики по обратной связи и использованию
+                </p>
+              </div>
+              {exportStatsToCSV && (
+                <Button
+                  onClick={exportStatsToCSV}
+                  className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+                >
+                  <Icon name="Download" className="mr-2" size={16} />
+                  Экспорт в CSV
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">

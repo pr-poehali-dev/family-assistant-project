@@ -169,6 +169,33 @@ export default function Index() {
     setCurrentTheme(theme);
     localStorage.setItem('familyOrganizerTheme', theme);
     setShowThemeSelector(false);
+    
+    const themeNames: Record<ThemeType, string> = {
+      young: 'Молодёжный',
+      middle: 'Деловой',
+      senior: 'Комфортный',
+      apple: 'Apple'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-white border-2 border-indigo-500 rounded-lg shadow-2xl p-4 z-[100] animate-fade-in';
+    notification.innerHTML = `
+      <div class="flex items-center gap-3">
+        <div class="text-2xl">🎨</div>
+        <div>
+          <p class="font-bold text-sm">Тема изменена</p>
+          <p class="text-xs text-gray-600">Стиль: ${themeNames[theme]}</p>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      notification.style.transform = 'translateX(100px)';
+      notification.style.transition = 'all 0.3s ease-out';
+      setTimeout(() => notification.remove(), 300);
+    }, 2000);
   };
 
   const handleFeedbackButton = (type: 'will_use' | 'not_interested') => {
@@ -182,6 +209,68 @@ export default function Index() {
       : 'Спасибо за обратную связь! Мы будем работать над улучшением проекта.');
   };
 
+  const exportStatsToCSV = () => {
+    const stats = JSON.parse(localStorage.getItem('feedbackStats') || '{}');
+    const willUse = stats.will_use || 0;
+    const notInterested = stats.not_interested || 0;
+    const total = willUse + notInterested;
+    const willUsePercent = total > 0 ? ((willUse / total) * 100).toFixed(2) : '0';
+    const notInterestedPercent = total > 0 ? ((notInterested / total) * 100).toFixed(2) : '0';
+    const timestamp = stats.timestamp || new Date().toISOString();
+    
+    const csvContent = [
+      ['Семейный Органайзер - Статистика обратной связи'],
+      ['Дата экспорта:', new Date().toLocaleString('ru-RU')],
+      ['Последнее обновление:', new Date(timestamp).toLocaleString('ru-RU')],
+      [''],
+      ['Тип отзыва', 'Количество', 'Процент'],
+      ['Буду использовать', willUse.toString(), willUsePercent + '%'],
+      ['Не интересно', notInterested.toString(), notInterestedPercent + '%'],
+      ['Всего откликов', total.toString(), '100%'],
+      [''],
+      ['Детальная информация:'],
+      ['Положительных откликов:', willUse.toString()],
+      ['Отрицательных откликов:', notInterested.toString()],
+      ['Процент заинтересованности:', willUsePercent + '%'],
+      ['Процент незаинтересованности:', notInterestedPercent + '%']
+    ]
+      .map(row => row.join(','))
+      .join('\n');
+    
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `family-organizer-stats-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-white border-2 border-green-500 rounded-lg shadow-2xl p-4 z-[100] animate-fade-in';
+    notification.innerHTML = `
+      <div class="flex items-center gap-3">
+        <div class="text-2xl">✅</div>
+        <div>
+          <p class="font-bold text-sm">Статистика экспортирована</p>
+          <p class="text-xs text-gray-600">Файл CSV сохранён</p>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      notification.style.transform = 'translateY(-20px)';
+      notification.style.transition = 'all 0.3s ease-out';
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  };
+
   const themeClasses = getThemeClasses(currentTheme);
 
   const totalPoints = familyMembers.reduce((sum, member) => sum + member.points, 0);
@@ -190,8 +279,8 @@ export default function Index() {
   const totalTasks = tasks.length;
 
   return (
-    <div className={`min-h-screen ${themeClasses.background} p-4 lg:p-8 ${themeClasses.baseFont}`}>
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className={`min-h-screen ${themeClasses.background} p-4 lg:p-8 ${themeClasses.baseFont} transition-all duration-700 ease-in-out`}>
+      <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
         <Card className="border-2 border-blue-300 bg-gradient-to-r from-blue-50 to-cyan-50 animate-fade-in">
           <CardContent className="py-6">
             <div className="text-center mb-4">
@@ -425,6 +514,7 @@ export default function Index() {
                 getWorkloadColor={getWorkloadColor}
                 getMemberById={getMemberById}
                 getAISuggestedMeals={getAISuggestedMeals}
+                exportStatsToCSV={exportStatsToCSV}
               />
             </Tabs>
           </div>
