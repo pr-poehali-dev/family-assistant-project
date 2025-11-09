@@ -22,6 +22,7 @@ import type {
   FamilyNeed,
   FamilyTreeMember,
   CalendarEvent,
+  AIRecommendation,
 } from '@/types/family.types';
 
 interface FamilyTabsContentProps {
@@ -46,6 +47,7 @@ interface FamilyTabsContentProps {
   setFamilyTree: React.Dispatch<React.SetStateAction<FamilyTreeMember[]>>;
   selectedTreeMember: FamilyTreeMember | null;
   setSelectedTreeMember: React.Dispatch<React.SetStateAction<FamilyTreeMember | null>>;
+  aiRecommendations: AIRecommendation[];
   selectedUserId: string;
   newMessage: string;
   setNewMessage: React.Dispatch<React.SetStateAction<string>>;
@@ -75,6 +77,7 @@ export function FamilyTabsContent({
   setFamilyTree,
   selectedTreeMember,
   setSelectedTreeMember,
+  aiRecommendations,
   selectedUserId,
   newMessage,
   setNewMessage,
@@ -1222,6 +1225,276 @@ export function FamilyTabsContent({
             </Card>
           ))}
         </div>
+      </TabsContent>
+
+      <TabsContent value="ai" className="space-y-6">
+        <Card className="border-cyan-200 bg-gradient-to-br from-cyan-50 to-blue-50">
+          <CardHeader>
+            <CardTitle className="text-3xl flex items-center gap-3">
+              <Icon name="Sparkles" className="text-cyan-600" size={32} />
+              ИИ-Рекомендации для здоровья
+            </CardTitle>
+            <p className="text-muted-foreground mt-2">
+              Персональные рекомендации по здоровью, питанию и развитию для каждого члена семьи
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-6">
+              {aiRecommendations.map((rec, idx) => {
+                const member = familyMembers.find(m => m.id === rec.memberId);
+                if (!member) return null;
+
+                return (
+                  <Card 
+                    key={rec.memberId}
+                    className="animate-fade-in border-2 border-cyan-200 hover:shadow-xl transition-all"
+                    style={{ animationDelay: `${idx * 0.1}s` }}
+                  >
+                    <CardHeader className="bg-gradient-to-r from-cyan-100 to-blue-100">
+                      <div className="flex items-center gap-4">
+                        <div className="text-6xl">{member.avatar}</div>
+                        <div className="flex-1">
+                          <CardTitle className="text-2xl">{rec.memberName}</CardTitle>
+                          <p className="text-sm text-muted-foreground">{rec.age} {rec.age === 1 ? 'год' : rec.age < 5 ? 'года' : 'лет'}</p>
+                          <Badge className="mt-2 bg-cyan-500">
+                            {rec.ageGroup === 'school' && '👦 Школьный возраст'}
+                            {rec.ageGroup === 'adult' && '👨 Взрослый'}
+                            {rec.ageGroup === 'senior' && '👴 Пожилой возраст'}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="pt-6 space-y-6">
+                      {rec.healthCheckups && rec.healthCheckups.length > 0 && (
+                        <Card className="bg-red-50 border-red-200">
+                          <CardHeader>
+                            <CardTitle className="text-lg flex items-center gap-2">
+                              <Icon name="Stethoscope" className="text-red-600" size={20} />
+                              Медицинские обследования
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-3">
+                            {rec.healthCheckups.map((checkup) => (
+                              <div key={checkup.id} className="p-3 bg-white rounded-lg border">
+                                <div className="flex items-start justify-between mb-1">
+                                  <h4 className="font-semibold">{checkup.name}</h4>
+                                  <Badge variant={checkup.importance === 'critical' ? 'destructive' : 'outline'}>
+                                    {checkup.importance === 'critical' && 'Критично'}
+                                    {checkup.importance === 'high' && 'Важно'}
+                                    {checkup.importance === 'medium' && 'Рекомендуется'}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground mb-2">{checkup.description}</p>
+                                <div className="flex items-center gap-2 text-sm">
+                                  <Icon name="Clock" size={14} className="text-blue-600" />
+                                  <span>Периодичность: {checkup.frequency}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {rec.vitamins && rec.vitamins.length > 0 && (
+                        <Card className="bg-orange-50 border-orange-200">
+                          <CardHeader>
+                            <CardTitle className="text-lg flex items-center gap-2">
+                              <Icon name="Pill" className="text-orange-600" size={20} />
+                              Витамины и добавки
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-3">
+                            {rec.vitamins.map((vitamin, vidx) => (
+                              <div key={vidx} className="p-3 bg-white rounded-lg border">
+                                <div className="flex items-start justify-between mb-1">
+                                  <h4 className="font-semibold">{vitamin.name}</h4>
+                                  <Badge variant="outline" className="bg-orange-100">{vitamin.dosage}</Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground">{vitamin.reason}</p>
+                                {vitamin.season && (
+                                  <p className="text-xs text-orange-600 mt-1">Особенно важно: {vitamin.season}</p>
+                                )}
+                              </div>
+                            ))}
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {rec.nutrition && rec.nutrition.length > 0 && (
+                        <Card className="bg-green-50 border-green-200">
+                          <CardHeader>
+                            <CardTitle className="text-lg flex items-center gap-2">
+                              <Icon name="Apple" className="text-green-600" size={20} />
+                              Питание
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-3">
+                            {rec.nutrition.map((nutr, nidx) => (
+                              <div key={nidx} className="p-3 bg-white rounded-lg border">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Icon name="ChefHat" size={16} className="text-green-600" />
+                                  <h4 className="font-semibold">{nutr.category}</h4>
+                                </div>
+                                <div className="flex flex-wrap gap-1 mb-2">
+                                  {nutr.items.map((item, iidx) => (
+                                    <Badge key={iidx} variant="outline" className="text-xs">{item}</Badge>
+                                  ))}
+                                </div>
+                                <p className="text-xs text-muted-foreground">{nutr.reason}</p>
+                              </div>
+                            ))}
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {rec.developmentMilestones && rec.developmentMilestones.length > 0 && (
+                        <Card className="bg-purple-50 border-purple-200">
+                          <CardHeader>
+                            <CardTitle className="text-lg flex items-center gap-2">
+                              <Icon name="TrendingUp" className="text-purple-600" size={20} />
+                              Развитие для возраста {rec.age} лет
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-3">
+                            {rec.developmentMilestones.map((milestone, midx) => (
+                              <div key={midx} className="p-3 bg-white rounded-lg border">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Icon name="Target" size={16} className="text-purple-600" />
+                                  <h4 className="font-semibold">{milestone.category}</h4>
+                                  <Badge className="ml-auto">{milestone.ageRange}</Badge>
+                                </div>
+                                <ul className="list-disc list-inside space-y-1 text-sm">
+                                  {milestone.skills.map((skill, sidx) => (
+                                    <li key={sidx} className="text-muted-foreground">{skill}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ))}
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {rec.cognitiveSkills && rec.cognitiveSkills.length > 0 && (
+                        <Card className="bg-indigo-50 border-indigo-200">
+                          <CardHeader>
+                            <CardTitle className="text-lg flex items-center gap-2">
+                              <Icon name="Brain" className="text-indigo-600" size={20} />
+                              Когнитивное развитие
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex flex-wrap gap-2">
+                              {rec.cognitiveSkills.map((skill, cidx) => (
+                                <Badge key={cidx} variant="outline" className="bg-indigo-100">{skill}</Badge>
+                              ))}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {rec.socialSkills && rec.socialSkills.length > 0 && (
+                        <Card className="bg-pink-50 border-pink-200">
+                          <CardHeader>
+                            <CardTitle className="text-lg flex items-center gap-2">
+                              <Icon name="Users" className="text-pink-600" size={20} />
+                              Социальные навыки
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex flex-wrap gap-2">
+                              {rec.socialSkills.map((skill, sidx) => (
+                                <Badge key={sidx} variant="outline" className="bg-pink-100">{skill}</Badge>
+                              ))}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {rec.physicalActivity && rec.physicalActivity.length > 0 && (
+                        <Card className="bg-teal-50 border-teal-200">
+                          <CardHeader>
+                            <CardTitle className="text-lg flex items-center gap-2">
+                              <Icon name="Activity" className="text-teal-600" size={20} />
+                              Физическая активность
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-2">
+                            {rec.physicalActivity.map((activity, aidx) => (
+                              <div key={aidx} className="flex items-center gap-3 p-2 bg-white rounded border">
+                                <Icon name="Dumbbell" size={16} className="text-teal-600" />
+                                <div>
+                                  <span className="font-semibold">{activity.type}</span>
+                                  <p className="text-xs text-muted-foreground">{activity.duration} • {activity.frequency}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {rec.warnings && rec.warnings.length > 0 && (
+                        <Card className="bg-yellow-50 border-yellow-300">
+                          <CardHeader>
+                            <CardTitle className="text-lg flex items-center gap-2">
+                              <Icon name="AlertTriangle" className="text-yellow-600" size={20} />
+                              Важные предостережения
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <ul className="space-y-2">
+                              {rec.warnings.map((warning, widx) => (
+                                <li key={widx} className="flex items-start gap-2">
+                                  <Icon name="AlertCircle" size={16} className="text-yellow-600 mt-0.5 flex-shrink-0" />
+                                  <span className="text-sm">{warning}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {rec.tips && rec.tips.length > 0 && (
+                        <Card className="bg-blue-50 border-blue-200">
+                          <CardHeader>
+                            <CardTitle className="text-lg flex items-center gap-2">
+                              <Icon name="Lightbulb" className="text-blue-600" size={20} />
+                              Полезные советы
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <ul className="space-y-2">
+                              {rec.tips.map((tip, tidx) => (
+                                <li key={tidx} className="flex items-start gap-2">
+                                  <Icon name="CheckCircle2" size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
+                                  <span className="text-sm">{tip}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            <Card className="bg-gradient-to-br from-cyan-100 to-blue-100 border-2 border-cyan-300 mt-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="Info" className="text-cyan-600" size={20} />
+                  О рекомендациях
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm space-y-2">
+                <p>• Рекомендации составлены на основе возраста, пола и общих медицинских стандартов</p>
+                <p>• Обязательно консультируйтесь с врачом перед началом приема витаминов или изменением режима</p>
+                <p>• Данные рекомендации носят информационный характер и не заменяют профессиональную медицинскую консультацию</p>
+              </CardContent>
+            </Card>
+          </CardContent>
+        </Card>
       </TabsContent>
     </>
   );

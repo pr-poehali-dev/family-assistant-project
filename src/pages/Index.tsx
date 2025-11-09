@@ -20,6 +20,7 @@ import type {
   FamilyNeed,
   FamilyTreeMember,
   CalendarEvent,
+  AIRecommendation,
 } from '@/types/family.types';
 import {
   initialFamilyMembers,
@@ -36,6 +37,7 @@ import {
   initialFamilyNeeds,
   initialFamilyTree,
   initialCalendarEvents,
+  initialAIRecommendations,
   getWeekDays,
 } from '@/data/mockData';
 import { FamilyTabsContent } from '@/components/FamilyTabsContent';
@@ -56,6 +58,7 @@ export default function Index() {
   const [familyNeeds, setFamilyNeeds] = useState<FamilyNeed[]>(initialFamilyNeeds);
   const [familyTree, setFamilyTree] = useState<FamilyTreeMember[]>(initialFamilyTree);
   const [selectedTreeMember, setSelectedTreeMember] = useState<FamilyTreeMember | null>(null);
+  const [aiRecommendations] = useState<AIRecommendation[]>(initialAIRecommendations);
   const [selectedUserId] = useState<string>('1');
   const [newMessage, setNewMessage] = useState('');
   const [calendarEvents] = useState<CalendarEvent[]>(initialCalendarEvents);
@@ -217,7 +220,7 @@ export default function Index() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <Tabs defaultValue="members" className="space-y-6">
-              <TabsList className="grid grid-cols-4 lg:grid-cols-7 gap-1 h-auto p-1 bg-white/50 backdrop-blur-sm">
+              <TabsList className="grid grid-cols-4 lg:grid-cols-8 gap-1 h-auto p-1 bg-white/50 backdrop-blur-sm">
                 <TabsTrigger value="members" className="text-sm lg:text-base py-3">
                   <Icon name="Users" className="mr-1 lg:mr-2" size={16} />
                   Семья
@@ -270,6 +273,10 @@ export default function Index() {
                   <Icon name="Heart" className="mr-1 lg:mr-2" size={16} />
                   Даты
                 </TabsTrigger>
+                <TabsTrigger value="ai" className="text-sm lg:text-base py-3">
+                  <Icon name="Sparkles" className="mr-1 lg:mr-2" size={16} />
+                  ИИ Здоровье
+                </TabsTrigger>
               </TabsList>
 
               <FamilyTabsContent
@@ -294,6 +301,7 @@ export default function Index() {
                 setFamilyTree={setFamilyTree}
                 selectedTreeMember={selectedTreeMember}
                 setSelectedTreeMember={setSelectedTreeMember}
+                aiRecommendations={aiRecommendations}
                 selectedUserId={selectedUserId}
                 newMessage={newMessage}
                 setNewMessage={setNewMessage}

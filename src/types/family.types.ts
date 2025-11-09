@@ -7,6 +7,7 @@ export interface FamilyMember {
   points: number;
   level: number;
   achievements: string[];
+  age?: number;
   foodPreferences?: {
     favorites: string[];
     dislikes: string[];
@@ -214,4 +215,52 @@ export interface FamilyTreeMember {
     date: string;
     event: string;
   }[];
+}
+
+export interface HealthCheckup {
+  id: string;
+  name: string;
+  description: string;
+  frequency: string;
+  importance: 'critical' | 'high' | 'medium';
+  nextDate?: string;
+}
+
+export interface NutritionRecommendation {
+  category: string;
+  items: string[];
+  importance: 'high' | 'medium' | 'low';
+  reason: string;
+}
+
+export interface DevelopmentMilestone {
+  category: string;
+  skills: string[];
+  ageRange: string;
+  achieved?: boolean;
+}
+
+export interface AIRecommendation {
+  memberId: string;
+  memberName: string;
+  age: number;
+  ageGroup: 'infant' | 'toddler' | 'preschool' | 'school' | 'teen' | 'adult' | 'senior';
+  healthCheckups?: HealthCheckup[];
+  vitamins?: {
+    name: string;
+    dosage: string;
+    reason: string;
+    season?: string;
+  }[];
+  nutrition?: NutritionRecommendation[];
+  developmentMilestones?: DevelopmentMilestone[];
+  physicalActivity?: {
+    type: string;
+    duration: string;
+    frequency: string;
+  }[];
+  cognitiveSkills?: string[];
+  socialSkills?: string[];
+  warnings?: string[];
+  tips?: string[];
 }
