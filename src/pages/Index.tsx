@@ -21,7 +21,9 @@ import type {
   FamilyTreeMember,
   CalendarEvent,
   AIRecommendation,
+  ThemeType,
 } from '@/types/family.types';
+import { themes, getThemeClasses } from '@/config/themes';
 import {
   initialFamilyMembers,
   initialTasks,
@@ -62,6 +64,11 @@ export default function Index() {
   const [selectedUserId] = useState<string>('1');
   const [newMessage, setNewMessage] = useState('');
   const [calendarEvents] = useState<CalendarEvent[]>(initialCalendarEvents);
+  const [currentTheme, setCurrentTheme] = useState<ThemeType>(() => {
+    const saved = localStorage.getItem('familyOrganizerTheme');
+    return (saved as ThemeType) || 'middle';
+  });
+  const [showThemeSelector, setShowThemeSelector] = useState(false);
 
   useEffect(() => {
     const newReminders: Reminder[] = tasks
@@ -158,13 +165,32 @@ export default function Index() {
     ];
   };
 
+  const handleThemeChange = (theme: ThemeType) => {
+    setCurrentTheme(theme);
+    localStorage.setItem('familyOrganizerTheme', theme);
+    setShowThemeSelector(false);
+  };
+
+  const handleFeedbackButton = (type: 'will_use' | 'not_interested') => {
+    const stats = JSON.parse(localStorage.getItem('feedbackStats') || '{}');
+    stats[type] = (stats[type] || 0) + 1;
+    stats.timestamp = new Date().toISOString();
+    localStorage.setItem('feedbackStats', JSON.stringify(stats));
+    
+    alert(type === 'will_use' 
+      ? '✅ Спасибо! Ваше мнение очень важно для нас!' 
+      : 'Спасибо за обратную связь! Мы будем работать над улучшением проекта.');
+  };
+
+  const themeClasses = getThemeClasses(currentTheme);
+
   const totalPoints = familyMembers.reduce((sum, member) => sum + member.points, 0);
   const avgWorkload = Math.round(familyMembers.reduce((sum, member) => sum + member.workload, 0) / familyMembers.length);
   const completedTasks = tasks.filter(t => t.completed).length;
   const totalTasks = tasks.length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-100 via-pink-100 to-purple-100 p-4 lg:p-8">
+    <div className={`min-h-screen ${themeClasses.background} p-4 lg:p-8 ${themeClasses.baseFont}`}>
       <div className="max-w-7xl mx-auto space-y-6">
         <Card className="border-2 border-blue-300 bg-gradient-to-r from-blue-50 to-cyan-50 animate-fade-in">
           <CardContent className="py-6">
@@ -177,6 +203,7 @@ export default function Index() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button 
                 size="lg"
+                onClick={() => handleFeedbackButton('will_use')}
                 className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
               >
                 <Icon name="ThumbsUp" className="mr-2" size={20} />
@@ -185,6 +212,7 @@ export default function Index() {
               <Button 
                 size="lg"
                 variant="destructive"
+                onClick={() => handleFeedbackButton('not_interested')}
                 className="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
               >
                 <Icon name="ThumbsDown" className="mr-2" size={20} />
@@ -194,8 +222,55 @@ export default function Index() {
           </CardContent>
         </Card>
 
-        <header className="text-center mb-8">
-          <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-orange-600 via-pink-600 to-purple-600 bg-clip-text text-transparent mb-4 animate-fade-in">
+        <header className="text-center mb-8 relative">
+          <div className="absolute top-0 right-4">
+            <Button
+              onClick={() => setShowThemeSelector(!showThemeSelector)}
+              className="bg-gradient-to-r from-indigo-500 to-purple-600"
+              size="sm"
+            >
+              <Icon name="Palette" className="mr-2" size={16} />
+              Стиль: {themes[currentTheme].name}
+            </Button>
+            
+            {showThemeSelector && (
+              <Card className="absolute right-0 top-12 z-50 w-80 border-2 border-indigo-300 shadow-2xl animate-fade-in">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Icon name="Palette" size={20} />
+                    Выберите стиль оформления
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {(Object.keys(themes) as ThemeType[]).map((themeKey) => {
+                    const theme = themes[themeKey];
+                    return (
+                      <button
+                        key={themeKey}
+                        onClick={() => handleThemeChange(themeKey)}
+                        className={`w-full text-left p-4 rounded-lg border-2 transition-all hover:shadow-lg ${
+                          currentTheme === themeKey 
+                            ? 'border-indigo-500 bg-indigo-50' 
+                            : 'border-gray-200 hover:border-indigo-300'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-bold">{theme.name}</h4>
+                          {currentTheme === themeKey && (
+                            <Icon name="Check" className="text-indigo-600" size={20} />
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-1">{theme.description}</p>
+                        <Badge variant="outline" className="text-xs">{theme.ageRange}</Badge>
+                      </button>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          <h1 className={`${themeClasses.headingFont} font-bold bg-gradient-to-r ${themeClasses.primaryGradient.replace('bg-gradient-to-r ', '')} bg-clip-text text-transparent mb-4 animate-fade-in`}>
             Семейный Органайзер
           </h1>
           <p className="text-lg lg:text-xl text-muted-foreground animate-fade-in" style={{ animationDelay: '0.2s' }}>
@@ -248,7 +323,7 @@ export default function Index() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <Tabs defaultValue="members" className="space-y-6">
-              <TabsList className="grid grid-cols-4 lg:grid-cols-10 gap-1 h-auto p-1 bg-white/50 backdrop-blur-sm">
+              <TabsList className="grid grid-cols-4 lg:grid-cols-11 gap-1 h-auto p-1 bg-white/50 backdrop-blur-sm">
                 <TabsTrigger value="members" className="text-sm lg:text-base py-3">
                   <Icon name="Users" className="mr-1 lg:mr-2" size={16} />
                   Семья
@@ -312,6 +387,10 @@ export default function Index() {
                 <TabsTrigger value="payment" className="text-sm lg:text-base py-3">
                   <Icon name="CreditCard" className="mr-1 lg:mr-2" size={16} />
                   Оплата
+                </TabsTrigger>
+                <TabsTrigger value="stats" className="text-sm lg:text-base py-3">
+                  <Icon name="BarChart3" className="mr-1 lg:mr-2" size={16} />
+                  Статистика
                 </TabsTrigger>
               </TabsList>
 

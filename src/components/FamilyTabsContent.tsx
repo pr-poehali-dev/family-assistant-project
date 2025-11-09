@@ -1816,6 +1816,143 @@ export function FamilyTabsContent({
           </CardContent>
         </Card>
       </TabsContent>
+
+      <TabsContent value="stats" className="space-y-6">
+        <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+          <CardHeader>
+            <CardTitle className="text-3xl flex items-center gap-3">
+              <Icon name="BarChart3" className="text-blue-600" size={32} />
+              Статистика проекта
+            </CardTitle>
+            <p className="text-muted-foreground mt-2">
+              Просмотр собранной статистики по обратной связи и использованию
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card className="border-2 border-green-300 bg-green-50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="ThumbsUp" className="text-green-600" size={24} />
+                    Буду использовать
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center">
+                    <div className="text-6xl font-bold text-green-600 mb-2">
+                      {JSON.parse(localStorage.getItem('feedbackStats') || '{}').will_use || 0}
+                    </div>
+                    <p className="text-sm text-muted-foreground">Положительных откликов</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-red-300 bg-red-50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="ThumbsDown" className="text-red-600" size={24} />
+                    Не интересно
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center">
+                    <div className="text-6xl font-bold text-red-600 mb-2">
+                      {JSON.parse(localStorage.getItem('feedbackStats') || '{}').not_interested || 0}
+                    </div>
+                    <p className="text-sm text-muted-foreground">Отрицательных откликов</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="border-2 border-indigo-300">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="PieChart" className="text-indigo-600" size={24} />
+                  Процентное соотношение
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {(() => {
+                    const stats = JSON.parse(localStorage.getItem('feedbackStats') || '{}');
+                    const willUse = stats.will_use || 0;
+                    const notInterested = stats.not_interested || 0;
+                    const total = willUse + notInterested || 1;
+                    const willUsePercent = Math.round((willUse / total) * 100);
+                    const notInterestedPercent = Math.round((notInterested / total) * 100);
+                    
+                    return (
+                      <>
+                        <div>
+                          <div className="flex justify-between mb-2">
+                            <span className="text-sm font-semibold">Буду использовать</span>
+                            <span className="text-sm font-bold text-green-600">{willUsePercent}%</span>
+                          </div>
+                          <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-green-500 to-emerald-600 transition-all"
+                              style={{ width: `${willUsePercent}%` }}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <div className="flex justify-between mb-2">
+                            <span className="text-sm font-semibold">Не интересно</span>
+                            <span className="text-sm font-bold text-red-600">{notInterestedPercent}%</span>
+                          </div>
+                          <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-red-500 to-rose-600 transition-all"
+                              style={{ width: `${notInterestedPercent}%` }}
+                            />
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-purple-300 bg-purple-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="MessageSquare" className="text-purple-600" size={24} />
+                  Отзывы из формы
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <Icon name="Inbox" size={48} className="text-purple-400 mx-auto mb-4" />
+                  <p className="text-muted-foreground mb-4">
+                    Отзывы будут отображаться здесь после отправки формы обратной связи
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Функционал находится в разработке. В полной версии здесь будет список всех отзывов с фильтрацией по типу и статусу.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-blue-100 to-indigo-100 border-2 border-blue-300">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="Info" className="text-blue-600" size={20} />
+                  О статистике
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <p>• Данные сохраняются локально в вашем браузере</p>
+                <p>• Статистика обновляется в реальном времени при нажатии кнопок</p>
+                <p>• В полной версии данные будут храниться в базе данных</p>
+                <p>• Вы можете очистить статистику, очистив кэш браузера</p>
+              </CardContent>
+            </Card>
+          </CardContent>
+        </Card>
+      </TabsContent>
     </>
   );
 }
