@@ -4,6 +4,8 @@ export interface FamilyMember {
   role: string;
   workload: number;
   avatar: string;
+  avatarType?: 'icon' | 'photo';
+  photoUrl?: string;
   points: number;
   level: number;
   achievements: string[];
@@ -24,6 +26,14 @@ export interface Task {
   points: number;
   reminderTime?: string;
   shoppingList?: string[];
+  isRecurring?: boolean;
+  recurringPattern?: {
+    frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
+    interval: number;
+    daysOfWeek?: number[];
+    endDate?: string;
+  };
+  nextOccurrence?: string;
 }
 
 export interface Reminder {

@@ -59,6 +59,44 @@ interface FamilyTabsContentProps {
   exportStatsToCSV?: () => void;
 }
 
+function getNextOccurrence(task: Task): string | undefined {
+  if (!task.isRecurring || !task.recurringPattern) return undefined;
+  
+  const now = new Date();
+  const { frequency, interval, daysOfWeek, endDate } = task.recurringPattern;
+  
+  if (endDate && new Date(endDate) < now) return undefined;
+  
+  const next = new Date(now);
+  
+  switch (frequency) {
+    case 'daily':
+      next.setDate(next.getDate() + interval);
+      break;
+    case 'weekly':
+      if (daysOfWeek && daysOfWeek.length > 0) {
+        const currentDay = next.getDay();
+        const sortedDays = [...daysOfWeek].sort((a, b) => a - b);
+        const nextDay = sortedDays.find(d => d > currentDay) || sortedDays[0];
+        const daysToAdd = nextDay > currentDay 
+          ? nextDay - currentDay 
+          : 7 - currentDay + nextDay;
+        next.setDate(next.getDate() + daysToAdd);
+      } else {
+        next.setDate(next.getDate() + 7 * interval);
+      }
+      break;
+    case 'monthly':
+      next.setMonth(next.getMonth() + interval);
+      break;
+    case 'yearly':
+      next.setFullYear(next.getFullYear() + interval);
+      break;
+  }
+  
+  return next.toISOString().split('T')[0];
+}
+
 export function FamilyTabsContent({
   familyMembers,
   tasks,
@@ -180,7 +218,78 @@ export function FamilyTabsContent({
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="text-5xl">{member.avatar}</div>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <button className="relative group cursor-pointer">
+                          {member.avatarType === 'photo' && member.photoUrl ? (
+                            <img 
+                              src={member.photoUrl} 
+                              alt={member.name}
+                              className="w-14 h-14 rounded-full object-cover border-2 border-gray-200 group-hover:border-orange-400 transition-all"
+                            />
+                          ) : (
+                            <div className="text-5xl group-hover:scale-110 transition-transform">
+                              {member.avatar}
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 rounded-full transition-all flex items-center justify-center">
+                            <Icon name="Camera" className="text-white opacity-0 group-hover:opacity-100" size={20} />
+                          </div>
+                        </button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Изменить аватар для {member.name}</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium mb-2">Загрузить фото</label>
+                            <Input 
+                              type="file" 
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onload = (event) => {
+                                    const photoUrl = event.target?.result as string;
+                                    const updatedMembers = familyMembers.map(m => 
+                                      m.id === member.id 
+                                        ? { ...m, photoUrl, avatarType: 'photo' as const }
+                                        : m
+                                    );
+                                    setFamilyMembers(updatedMembers);
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                            />
+                          </div>
+                          
+                          <div className="border-t pt-4">
+                            <label className="block text-sm font-medium mb-2">Или выберите иконку</label>
+                            <div className="grid grid-cols-6 gap-2">
+                              {['👨', '👩', '👴', '👵', '👦', '👧', '🧑', '👶', '🧔', '👨‍🦱', '👩‍🦰', '🧑‍🦳'].map((emoji) => (
+                                <button
+                                  key={emoji}
+                                  className="text-3xl hover:bg-gray-100 rounded p-2 transition-colors"
+                                  onClick={() => {
+                                    const updatedMembers = familyMembers.map(m => 
+                                      m.id === member.id 
+                                        ? { ...m, avatar: emoji, avatarType: 'icon' as const, photoUrl: undefined }
+                                        : m
+                                    );
+                                    setFamilyMembers(updatedMembers);
+                                  }}
+                                >
+                                  {emoji}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                     <div>
                       <CardTitle className="text-xl">{member.name}</CardTitle>
                       <p className="text-sm text-muted-foreground">{member.role}</p>
@@ -483,36 +592,146 @@ export function FamilyTabsContent({
       </TabsContent>
 
       <TabsContent value="tasks" className="space-y-4">
-        {tasks.map((task, index) => (
-          <Card 
-            key={task.id} 
-            className="animate-fade-in hover:shadow-md transition-all"
-            style={{ animationDelay: `${index * 0.1}s` }}
-          >
-            <CardContent className="flex items-center justify-between p-4">
-              <div className="flex items-center gap-3">
-                <Checkbox 
-                  checked={task.completed}
-                  onCheckedChange={() => toggleTask(task.id)}
-                />
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold">Задачи</h3>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="bg-gradient-to-r from-blue-500 to-purple-500">
+                <Icon name="Plus" className="mr-2" size={16} />
+                Добавить задачу
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Новая задача</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
                 <div>
-                  <p className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
-                    {task.title}
-                  </p>
-                  <div className="flex gap-2 mt-1">
-                    <Badge variant="outline" className="text-xs">{task.assignee}</Badge>
-                    <Badge variant="secondary" className="text-xs">{task.category}</Badge>
+                  <label className="block text-sm font-medium mb-2">Название задачи</label>
+                  <Input placeholder="Например: Полить цветы" />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">Исполнитель</label>
+                  <select className="w-full border rounded-md p-2">
+                    {familyMembers.map(member => (
+                      <option key={member.id} value={member.id}>{member.name}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">Повторяющаяся задача</label>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Checkbox id="recurring" />
+                      <label htmlFor="recurring" className="text-sm">Сделать повторяющейся</label>
+                    </div>
+                    
+                    <div className="pl-6 space-y-3 border-l-2 border-gray-200">
+                      <div>
+                        <label className="block text-xs font-medium mb-1">Частота повтора</label>
+                        <select className="w-full border rounded-md p-2 text-sm">
+                          <option value="daily">Ежедневно</option>
+                          <option value="weekly">Еженедельно</option>
+                          <option value="monthly">Ежемесячно</option>
+                          <option value="yearly">Ежегодно</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs font-medium mb-1">Интервал</label>
+                        <Input type="number" min="1" defaultValue="1" placeholder="Каждые N дней/недель/месяцев" className="text-sm" />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs font-medium mb-2">Дни недели (для еженедельных)</label>
+                        <div className="flex flex-wrap gap-2">
+                          {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((day, idx) => (
+                            <button
+                              key={idx}
+                              className="px-3 py-1 text-xs border rounded-md hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                            >
+                              {day}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs font-medium mb-1">Окончание повторений</label>
+                        <Input type="date" className="text-sm" />
+                      </div>
+                    </div>
                   </div>
                 </div>
+                
+                <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-500">
+                  Создать задачу
+                </Button>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white">
-                  +{task.points} баллов
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+            </DialogContent>
+          </Dialog>
+        </div>
+        
+        {tasks.map((task, index) => {
+          const nextOccurrence = getNextOccurrence(task);
+          
+          return (
+            <Card 
+              key={task.id} 
+              className="animate-fade-in hover:shadow-md transition-all"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              <CardContent className="flex items-center justify-between p-4">
+                <div className="flex items-center gap-3">
+                  <Checkbox 
+                    checked={task.completed}
+                    onCheckedChange={() => toggleTask(task.id)}
+                  />
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
+                        {task.title}
+                      </p>
+                      {task.isRecurring && (
+                        <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                          <Icon name="RotateCw" size={12} className="mr-1" />
+                          Повторяется
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex gap-2 mt-1 flex-wrap">
+                      <Badge variant="outline" className="text-xs">{task.assignee}</Badge>
+                      <Badge variant="secondary" className="text-xs">{task.category}</Badge>
+                      {task.isRecurring && task.recurringPattern && (
+                        <>
+                          <Badge variant="outline" className="text-xs bg-indigo-50 text-indigo-700">
+                            {task.recurringPattern.frequency === 'daily' && `Каждые ${task.recurringPattern.interval} дн.`}
+                            {task.recurringPattern.frequency === 'weekly' && `Каждые ${task.recurringPattern.interval} нед.`}
+                            {task.recurringPattern.frequency === 'monthly' && `Каждые ${task.recurringPattern.interval} мес.`}
+                            {task.recurringPattern.frequency === 'yearly' && `Каждый год`}
+                          </Badge>
+                          {nextOccurrence && (
+                            <Badge variant="outline" className="text-xs bg-green-50 text-green-700">
+                              <Icon name="Calendar" size={12} className="mr-1" />
+                              След: {nextOccurrence}
+                            </Badge>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white">
+                    +{task.points} баллов
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </TabsContent>
 
       <TabsContent value="chat" className="space-y-4">

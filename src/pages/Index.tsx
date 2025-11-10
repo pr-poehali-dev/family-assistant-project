@@ -455,29 +455,21 @@ export default function Index() {
                   <Icon name="Users" className="mr-1" size={14} />
                   Семья
                 </TabsTrigger>
-                <TabsTrigger value="tree" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
-                  <Icon name="Network" className="mr-1" size={14} />
-                  Древо
-                </TabsTrigger>
                 <TabsTrigger value="tasks" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
                   <Icon name="CheckSquare" className="mr-1" size={14} />
                   Задачи
-                </TabsTrigger>
-                <TabsTrigger value="chat" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
-                  <Icon name="MessageSquare" className="mr-1" size={14} />
-                  Чат
-                </TabsTrigger>
-                <TabsTrigger value="album" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
-                  <Icon name="Image" className="mr-1" size={14} />
-                  Альбом
                 </TabsTrigger>
                 <TabsTrigger value="needs" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
                   <Icon name="ListTodo" className="mr-1" size={14} />
                   Потребности
                 </TabsTrigger>
-                <TabsTrigger value="rating" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
-                  <Icon name="Trophy" className="mr-1" size={14} />
-                  Рейтинг
+                <TabsTrigger value="chat" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
+                  <Icon name="MessageSquare" className="mr-1" size={14} />
+                  Чат
+                </TabsTrigger>
+                <TabsTrigger value="tree" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
+                  <Icon name="Network" className="mr-1" size={14} />
+                  Древо
                 </TabsTrigger>
                 <TabsTrigger value="traditions" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
                   <Icon name="Calendar" className="mr-1" size={14} />
@@ -487,37 +479,45 @@ export default function Index() {
                   <Icon name="Sparkles" className="mr-1" size={14} />
                   Ценности
                 </TabsTrigger>
+                <TabsTrigger value="dates" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
+                  <Icon name="Heart" className="mr-1" size={14} />
+                  Даты
+                </TabsTrigger>
                 <TabsTrigger value="meals" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
                   <Icon name="ChefHat" className="mr-1" size={14} />
                   Меню
+                </TabsTrigger>
+                <TabsTrigger value="album" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
+                  <Icon name="Image" className="mr-1" size={14} />
+                  Альбом
                 </TabsTrigger>
                 <TabsTrigger value="development" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
                   <Icon name="GraduationCap" className="mr-1" size={14} />
                   Развитие
                 </TabsTrigger>
-                <TabsTrigger value="community" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
-                  <Icon name="BookOpen" className="mr-1" size={14} />
-                  Блог
-                </TabsTrigger>
-                <TabsTrigger value="dates" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
-                  <Icon name="Heart" className="mr-1" size={14} />
-                  Даты
-                </TabsTrigger>
                 <TabsTrigger value="ai" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
                   <Icon name="Sparkles" className="mr-1" size={14} />
                   ИИ Здоровье
                 </TabsTrigger>
-                <TabsTrigger value="feedback" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
-                  <Icon name="MessageSquare" className="mr-1" size={14} />
-                  Отзывы
+                <TabsTrigger value="rating" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
+                  <Icon name="Trophy" className="mr-1" size={14} />
+                  Рейтинг
+                </TabsTrigger>
+                <TabsTrigger value="stats" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
+                  <Icon name="BarChart3" className="mr-1" size={14} />
+                  Статистика
+                </TabsTrigger>
+                <TabsTrigger value="community" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
+                  <Icon name="BookOpen" className="mr-1" size={14} />
+                  Блог
                 </TabsTrigger>
                 <TabsTrigger value="payment" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
                   <Icon name="CreditCard" className="mr-1" size={14} />
                   Оплата
                 </TabsTrigger>
-                <TabsTrigger value="stats" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
-                  <Icon name="BarChart3" className="mr-1" size={14} />
-                  Статистика
+                <TabsTrigger value="feedback" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
+                  <Icon name="MessageSquare" className="mr-1" size={14} />
+                  Тех. поддержка
                 </TabsTrigger>
               </TabsList>
 
