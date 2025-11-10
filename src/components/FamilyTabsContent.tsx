@@ -129,6 +129,7 @@ export function FamilyTabsContent({
   getAISuggestedMeals,
   exportStatsToCSV,
 }: FamilyTabsContentProps) {
+  const [taskFilter, setTaskFilter] = useState<string>('all');
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
     
@@ -658,9 +659,25 @@ export function FamilyTabsContent({
       </TabsContent>
 
       <TabsContent value="tasks" className="space-y-4">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
           <h3 className="text-lg font-semibold">Задачи</h3>
-          <Dialog>
+          
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full sm:w-auto">
+            <div className="flex-1 sm:flex-initial">
+              <select
+                value={taskFilter}
+                onChange={(e) => setTaskFilter(e.target.value)}
+                className="w-full sm:w-auto px-4 py-2 border-2 border-blue-300 rounded-md bg-white text-sm font-medium hover:border-blue-400 transition-colors"
+              >
+                <option value="all">Все задачи</option>
+                {familyMembers.map(member => (
+                  <option key={member.id} value={member.name}>
+                    {member.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <Dialog>
             <DialogTrigger asChild>
               <Button className="bg-gradient-to-r from-blue-500 to-purple-500">
                 <Icon name="Plus" className="mr-2" size={16} />
@@ -738,9 +755,12 @@ export function FamilyTabsContent({
               </div>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
         
-        {tasks.map((task, index) => {
+        {tasks
+          .filter(task => taskFilter === 'all' || task.assignee === taskFilter)
+          .map((task, index) => {
           const nextOccurrence = getNextOccurrence(task);
           
           return (
