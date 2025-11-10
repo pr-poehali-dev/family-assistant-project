@@ -235,14 +235,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         family_id = get_user_family_id(user_id)
-        if not family_id:
-            return {
-                'statusCode': 403,
-                'headers': headers,
-                'body': json.dumps({'error': 'Пользователь не состоит в семье'})
-            }
         
         if method == 'GET':
+            if not family_id:
+                return {
+                    'statusCode': 200,
+                    'headers': headers,
+                    'body': json.dumps({'members': []})
+                }
             members = get_family_members(family_id)
             return {
                 'statusCode': 200,
@@ -251,6 +251,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         elif method == 'POST':
+            if not family_id:
+                return {
+                    'statusCode': 403,
+                    'headers': headers,
+                    'body': json.dumps({'error': 'Пользователь не состоит в семье'})
+                }
             body = json.loads(event.get('body', '{}'))
             result = add_family_member(family_id, body)
             
@@ -268,6 +274,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         elif method == 'PUT':
+            if not family_id:
+                return {
+                    'statusCode': 403,
+                    'headers': headers,
+                    'body': json.dumps({'error': 'Пользователь не состоит в семье'})
+                }
             body = json.loads(event.get('body', '{}'))
             member_id = body.get('id')
             
@@ -294,6 +306,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         elif method == 'DELETE':
+            if not family_id:
+                return {
+                    'statusCode': 403,
+                    'headers': headers,
+                    'body': json.dumps({'error': 'Пользователь не состоит в семье'})
+                }
             params = event.get('queryStringParameters', {})
             member_id = params.get('id')
             
