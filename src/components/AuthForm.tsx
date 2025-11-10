@@ -14,6 +14,8 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   
+  const [registerMethod, setRegisterMethod] = useState<'email' | 'phone'>('email');
+  
   const [registerData, setRegisterData] = useState({
     email: '',
     phone: '',
@@ -36,8 +38,9 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
       return;
     }
     
-    if (!registerData.email && !registerData.phone) {
-      setError('Укажите email или телефон');
+    const credential = registerMethod === 'email' ? registerData.email : registerData.phone;
+    if (!credential) {
+      setError(`Укажите ${registerMethod === 'email' ? 'email' : 'телефон'}`);
       return;
     }
     
@@ -50,8 +53,8 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          email: registerData.email || undefined,
-          phone: registerData.phone || undefined,
+          email: registerMethod === 'email' ? registerData.email : undefined,
+          phone: registerMethod === 'phone' ? registerData.phone : undefined,
           password: registerData.password,
           family_name: registerData.familyName || undefined
         })
@@ -174,33 +177,50 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
             
             <TabsContent value="register">
               <form onSubmit={handleRegister} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="reg-email">Email</Label>
-                  <Input
-                    id="reg-email"
-                    type="email"
-                    placeholder="example@mail.com"
-                    value={registerData.email}
-                    onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
-                  />
+                <div className="flex gap-2 mb-4">
+                  <Button
+                    type="button"
+                    variant={registerMethod === 'email' ? 'default' : 'outline'}
+                    onClick={() => setRegisterMethod('email')}
+                    className="flex-1"
+                  >
+                    Email
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={registerMethod === 'phone' ? 'default' : 'outline'}
+                    onClick={() => setRegisterMethod('phone')}
+                    className="flex-1"
+                  >
+                    Телефон
+                  </Button>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <div className="h-px bg-gray-300 flex-1" />
-                  <span className="text-sm text-gray-500">или</span>
-                  <div className="h-px bg-gray-300 flex-1" />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="reg-phone">Телефон</Label>
-                  <Input
-                    id="reg-phone"
-                    type="tel"
-                    placeholder="+79991234567"
-                    value={registerData.phone}
-                    onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
-                  />
-                </div>
+                {registerMethod === 'email' ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="reg-email">Email</Label>
+                    <Input
+                      id="reg-email"
+                      type="email"
+                      placeholder="example@mail.com"
+                      value={registerData.email}
+                      onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
+                      required
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Label htmlFor="reg-phone">Телефон</Label>
+                    <Input
+                      id="reg-phone"
+                      type="tel"
+                      placeholder="+79991234567"
+                      value={registerData.phone}
+                      onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
+                      required
+                    />
+                  </div>
+                )}
                 
                 <div className="space-y-2">
                   <Label htmlFor="reg-family">Название семьи (необязательно)</Label>

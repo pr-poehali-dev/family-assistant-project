@@ -38,6 +38,9 @@ def register_user(email: Optional[str], phone: Optional[str], password: str, fam
     if not email and not phone:
         return {'error': 'Email или телефон обязательны'}
     
+    if email and phone:
+        return {'error': 'Укажите только email ИЛИ телефон, не оба сразу'}
+    
     if email and not validate_email(email):
         return {'error': 'Некорректный email'}
     
