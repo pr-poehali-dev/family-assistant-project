@@ -647,6 +647,10 @@ export default function Index() {
                   <Icon name="MessageSquare" className="mr-1" size={14} />
                   Тех. поддержка
                 </TabsTrigger>
+                <TabsTrigger value="alice" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
+                  <Icon name="Mic" className="mr-1" size={14} />
+                  Алиса
+                </TabsTrigger>
               </TabsList>
 
               <FamilyTabsContent

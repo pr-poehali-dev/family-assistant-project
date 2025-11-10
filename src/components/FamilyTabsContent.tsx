@@ -2167,6 +2167,240 @@ export function FamilyTabsContent({
         </Card>
       </TabsContent>
 
+      <TabsContent value="alice" className="space-y-6">
+        <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
+          <CardHeader>
+            <CardTitle className="text-3xl flex items-center gap-3">
+              <Icon name="Mic" className="text-purple-600" size={32} />
+              Интеграция с Алисой
+            </CardTitle>
+            <p className="text-muted-foreground mt-2">
+              Управляйте семейным органайзером голосом через Яндекс Алису
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <Card className="border-2 border-purple-300 bg-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="Zap" className="text-purple-600" size={24} />
+                  Webhook URL для навыка Алисы
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-gray-100 p-4 rounded-lg border-2 border-gray-300 font-mono text-sm break-all">
+                  https://functions.poehali.dev/06ed580e-0fae-4278-a2cc-e5f626486d18
+                </div>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => {
+                    navigator.clipboard.writeText('https://functions.poehali.dev/06ed580e-0fae-4278-a2cc-e5f626486d18');
+                    alert('✅ URL скопирован в буфер обмена!');
+                  }}
+                >
+                  <Icon name="Copy" className="mr-2" size={16} />
+                  Скопировать URL
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-blue-300">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="BookOpen" className="text-blue-600" size={24} />
+                  Инструкция по подключению
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-4">
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">
+                      1
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-1">Перейдите в Яндекс Диалоги</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Откройте <a href="https://dialogs.yandex.ru/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">dialogs.yandex.ru</a> и войдите в аккаунт
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">
+                      2
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-1">Создайте новый навык</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Нажмите "Создать диалог" → выберите "Навык для Алисы" → введите название "Семейный Органайзер"
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">
+                      3
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-1">Настройте Webhook</h4>
+                      <p className="text-sm text-muted-foreground">
+                        В разделе "Backend" → выберите "Webhook" → вставьте URL выше → сохраните
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">
+                      4
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-1">Опубликуйте навык</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Заполните описание навыка → нажмите "На модерацию" → дождитесь одобрения (1-3 дня)
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold">
+                      5
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-1">Активируйте навык</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Скажите "Алиса, запусти навык Семейный Органайзер" или включите в мобильном приложении Яндекс
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-green-300 bg-green-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="MessageCircle" className="text-green-600" size={24} />
+                  Доступные голосовые команды
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="bg-white p-4 rounded-lg border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon name="Plus" className="text-blue-600" size={20} />
+                      <h4 className="font-semibold">Добавление задач</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">Примеры команд:</p>
+                    <ul className="text-sm space-y-1">
+                      <li>• "Добавь задачу купить молоко для Маши"</li>
+                      <li>• "Создай задачу полить цветы"</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-white p-4 rounded-lg border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon name="List" className="text-purple-600" size={20} />
+                      <h4 className="font-semibold">Просмотр задач</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">Примеры команд:</p>
+                    <ul className="text-sm space-y-1">
+                      <li>• "Покажи задачи"</li>
+                      <li>• "Какие задачи на сегодня?"</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-white p-4 rounded-lg border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon name="ChefHat" className="text-orange-600" size={20} />
+                      <h4 className="font-semibold">Готовка</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">Примеры команд:</p>
+                    <ul className="text-sm space-y-1">
+                      <li>• "Кто сегодня готовит?"</li>
+                      <li>• "Чья очередь готовить?"</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-white p-4 rounded-lg border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon name="Users" className="text-pink-600" size={20} />
+                      <h4 className="font-semibold">Информация о семье</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">Примеры команд:</p>
+                    <ul className="text-sm space-y-1">
+                      <li>• "Покажи семью"</li>
+                      <li>• "Покажи рейтинг"</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-white p-4 rounded-lg border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon name="HelpCircle" className="text-gray-600" size={20} />
+                      <h4 className="font-semibold">Помощь</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">Примеры команд:</p>
+                    <ul className="text-sm space-y-1">
+                      <li>• "Помощь"</li>
+                      <li>• "Что ты умеешь?"</li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-amber-300 bg-amber-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="Sparkles" className="text-amber-600" size={24} />
+                  Где использовать Алису
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <div className="text-5xl mb-2">🏠</div>
+                    <h4 className="font-semibold mb-1">Яндекс Станция</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Умная колонка для всей семьи
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-5xl mb-2">📱</div>
+                    <h4 className="font-semibold mb-1">Мобильное приложение</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Яндекс или Алиса на iOS/Android
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-5xl mb-2">💻</div>
+                    <h4 className="font-semibold mb-1">Браузер</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Яндекс.Браузер с голосовым помощником
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-purple-100 to-pink-100 border-2 border-purple-300">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="Info" className="text-purple-600" size={20} />
+                  Важная информация
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm space-y-2">
+                <p>• Для использования навыка нужен аккаунт Яндекс</p>
+                <p>• Навык работает на всех устройствах с Алисой</p>
+                <p>• Голосовые команды обрабатываются в реальном времени</p>
+                <p>• Для полной функциональности требуется интернет-соединение</p>
+                <p>• После публикации навык доступен только вам (можно сделать публичным)</p>
+              </CardContent>
+            </Card>
+          </CardContent>
+        </Card>
+      </TabsContent>
+
       <TabsContent value="stats" className="space-y-6">
         <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
           <CardHeader>
