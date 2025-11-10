@@ -1995,21 +1995,3 @@ export const initialAIRecommendations: AIRecommendation[] = [
     ]
   }
 ];
-
-export function getWeekDays() {
-  const days = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
-  const today = new Date();
-  const weekDays = [];
-  
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() + i);
-    weekDays.push({
-      day: days[date.getDay()],
-      date: date.getDate(),
-      fullDate: date.toISOString().split('T')[0]
-    });
-  }
-  
-  return weekDays;
-}
