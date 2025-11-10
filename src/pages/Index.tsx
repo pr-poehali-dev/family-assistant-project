@@ -45,7 +45,11 @@ import {
 import { FamilyTabsContent } from '@/components/FamilyTabsContent';
 import { LoginScreen } from '@/components/LoginScreen';
 
-export default function Index() {
+interface IndexProps {
+  onLogout?: () => void;
+}
+
+export default function Index({ onLogout }: IndexProps) {
   const [currentUserId, setCurrentUserId] = useState<string | null>(() => {
     return localStorage.getItem('currentUserId');
   });
@@ -466,7 +470,10 @@ export default function Index() {
           <div className="flex justify-between items-start mb-4 lg:mb-0">
             <div className="lg:absolute lg:top-0 lg:left-4">
               <Button
-                onClick={handleLogout}
+                onClick={() => {
+                  handleLogout();
+                  onLogout?.();
+                }}
                 variant="outline"
                 className="border-2 border-orange-300 hover:bg-orange-50"
                 size="sm"

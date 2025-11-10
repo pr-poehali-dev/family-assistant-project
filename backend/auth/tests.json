@@ -1,0 +1,58 @@
+{
+  "tests": [
+    {
+      "name": "Register new user with email",
+      "method": "POST",
+      "path": "/?action=register",
+      "body": {
+        "email": "test@example.com",
+        "password": "test123456"
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "success": true,
+        "token": "string",
+        "user": {
+          "id": "string",
+          "email": "string"
+        }
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Login with valid credentials",
+      "method": "POST",
+      "path": "/?action=login",
+      "body": {
+        "login": "test@example.com",
+        "password": "test123456"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "token": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Login with invalid credentials",
+      "method": "POST",
+      "path": "/?action=login",
+      "body": {
+        "login": "test@example.com",
+        "password": "wrongpassword"
+      },
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Handle OPTIONS for CORS",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}
