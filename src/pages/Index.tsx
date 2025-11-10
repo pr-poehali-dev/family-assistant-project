@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
 import { useTasks } from '@/hooks/useTasks';
+import { useFamilyMembers } from '@/hooks/useFamilyMembers';
 import type {
   FamilyMember,
   Task,
@@ -26,7 +27,6 @@ import type {
 } from '@/types/family.types';
 import { themes, getThemeClasses } from '@/config/themes';
 import {
-  initialFamilyMembers,
   initialChildrenProfiles,
   initialDevelopmentPlans,
   initialImportantDates,
@@ -43,24 +43,20 @@ import {
   getWeekDays,
 } from '@/data/mockData';
 import { FamilyTabsContent } from '@/components/FamilyTabsContent';
-import { LoginScreen } from '@/components/LoginScreen';
+import SettingsMenu from '@/components/SettingsMenu';
 
 interface IndexProps {
   onLogout?: () => void;
 }
 
 export default function Index({ onLogout }: IndexProps) {
-  const [currentUserId, setCurrentUserId] = useState<string | null>(() => {
-    return localStorage.getItem('currentUserId');
-  });
-  
-  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>(() => {
-    const saved = localStorage.getItem('familyMembers');
-    return saved ? JSON.parse(saved) : initialFamilyMembers;
-  });
-  
+  const { members: familyMembers, loading: membersLoading, addMember, updateMember, deleteMember } = useFamilyMembers();
   const { tasks, loading: tasksLoading, toggleTask: toggleTaskDB, createTask, updateTask, deleteTask } = useTasks();
   const [reminders, setReminders] = useState<Reminder[]>([]);
+  
+  const setFamilyMembers = (value: FamilyMember[] | ((prev: FamilyMember[]) => FamilyMember[])) => {
+    console.warn('setFamilyMembers deprecated, use updateMember instead');
+  };
   const [importantDates] = useState<ImportantDate[]>(initialImportantDates);
   const [familyValues] = useState<FamilyValue[]>(initialFamilyValues);
   const [blogPosts] = useState<BlogPost[]>(initialBlogPosts);
@@ -84,25 +80,12 @@ export default function Index({ onLogout }: IndexProps) {
   const [showWelcome, setShowWelcome] = useState(true);
   const [welcomeText, setWelcomeText] = useState('');
 
-  const handleLogin = (memberId: string) => {
-    setCurrentUserId(memberId);
-    localStorage.setItem('currentUserId', memberId);
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const currentUser = familyMembers.find(m => m.user_id === user.id || m.id === user.member_id);
+
+  const handleLogoutLocal = () => {
+    onLogout?.();
   };
-
-  const handleLogout = () => {
-    setCurrentUserId(null);
-    localStorage.removeItem('currentUserId');
-  };
-
-  const currentUser = familyMembers.find(m => m.id === currentUserId);
-
-  if (!currentUserId || !currentUser) {
-    return <LoginScreen familyMembers={familyMembers} onLogin={handleLogin} />;
-  }
-
-  useEffect(() => {
-    localStorage.setItem('familyMembers', JSON.stringify(familyMembers));
-  }, [familyMembers]);
 
   useEffect(() => {
     const newReminders: Reminder[] = tasks
@@ -207,15 +190,17 @@ export default function Index({ onLogout }: IndexProps) {
     return next.toISOString().split('T')[0];
   };
 
-  const addPoints = (memberName: string, points: number) => {
-    setFamilyMembers(familyMembers.map(member => {
-      if (member.name === memberName) {
-        const newPoints = member.points + points;
-        const newLevel = Math.floor(newPoints / 100) + 1;
-        return { ...member, points: newPoints, level: newLevel };
-      }
-      return member;
-    }));
+  const addPoints = async (memberName: string, points: number) => {
+    const member = familyMembers.find(m => m.name === memberName);
+    if (member) {
+      const newPoints = member.points + points;
+      const newLevel = Math.floor(newPoints / 100) + 1;
+      await updateMember({
+        id: member.id,
+        points: newPoints,
+        level: newLevel
+      });
+    }
   };
 
   const getWorkloadColor = (workload: number) => {
@@ -447,19 +432,17 @@ export default function Index({ onLogout }: IndexProps) {
 
         <header className="text-center mb-8 relative">
           <div className="flex justify-between items-start mb-4 lg:mb-0">
-            <div className="lg:absolute lg:top-0 lg:left-4">
+            <div className="lg:absolute lg:top-0 lg:left-4 flex gap-2">
               <Button
-                onClick={() => {
-                  handleLogout();
-                  onLogout?.();
-                }}
+                onClick={handleLogoutLocal}
                 variant="outline"
                 className="border-2 border-orange-300 hover:bg-orange-50"
                 size="sm"
               >
                 <Icon name="LogOut" className="mr-2" size={16} />
-                Выход ({currentUser.name})
+                Выход ({currentUser?.name || 'Пользователь'})
               </Button>
+              <SettingsMenu />
             </div>
             
             <div className="lg:absolute lg:top-0 lg:right-4">

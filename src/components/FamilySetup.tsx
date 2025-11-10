@@ -39,10 +39,37 @@ export default function FamilySetup({ user, onSetupComplete }: FamilySetupProps)
   const handleComplete = async () => {
     setIsLoading(true);
     
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setIsLoading(false);
-    onSetupComplete();
+    try {
+      const token = localStorage.getItem('authToken');
+      const relationship = profileData.relationship === 'Другое' 
+        ? profileData.customRelationship 
+        : profileData.relationship;
+
+      const response = await fetch('https://functions.poehali.dev/db70be67-64af-4e9d-ab90-8485ed49c99f', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': token || ''
+        },
+        body: JSON.stringify({
+          action: 'update_profile',
+          name: profileData.name,
+          role: profileData.role,
+          relationship: relationship,
+          avatar: profileData.avatar
+        })
+      });
+
+      if (response.ok) {
+        onSetupComplete();
+      } else {
+        alert('❌ Ошибка сохранения профиля');
+        setIsLoading(false);
+      }
+    } catch (error) {
+      alert('❌ Ошибка сети');
+      setIsLoading(false);
+    }
   };
 
   if (!user.family_id) {
