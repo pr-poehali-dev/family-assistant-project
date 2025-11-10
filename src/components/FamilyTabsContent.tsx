@@ -422,7 +422,7 @@ export function FamilyTabsContent({
 
       <TabsContent value="tree" className="space-y-6">
         <Card className="border-amber-200 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 overflow-hidden">
-          <CardHeader className="relative">
+          <CardHeader className="relative py-4">
             <div 
               className="absolute inset-0 opacity-10 bg-cover bg-center"
               style={{ 
@@ -431,31 +431,31 @@ export function FamilyTabsContent({
               }}
             ></div>
             <div className="relative z-10">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
-                  <CardTitle className="text-4xl font-bold flex items-center gap-3 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
-                    <Icon name="TreePine" className="text-amber-700" size={40} />
+                  <CardTitle className="text-2xl sm:text-3xl font-bold flex items-center gap-2 mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+                    <Icon name="TreePine" className="text-amber-700" size={28} />
                     Генеалогическое Древо Семьи
                   </CardTitle>
-                  <p className="text-amber-800 italic">История рода в поколениях</p>
+                  <p className="text-amber-800 italic text-sm">История рода в поколениях</p>
                 </div>
-                <Button className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700">
-                  <Icon name="Plus" className="mr-2" size={16} />
+                <Button className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700" size="sm">
+                  <Icon name="Plus" className="mr-2" size={14} />
                   Добавить
                 </Button>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-8 relative">
-            <div className="relative overflow-x-auto pb-8">
-              <div className="min-w-[900px] mx-auto">
+          <CardContent className="p-4 sm:p-6 relative">
+            <div className="relative overflow-x-auto pb-4">
+              <div className="min-w-[700px] mx-auto">
                 {[0, 1, 2].map(generation => {
                   const members = familyTree.filter(m => m.generation === generation);
                   if (members.length === 0) return null;
                   
                   return (
-                    <div key={generation} className="mb-12 relative">
-                      <div className="flex justify-center gap-6 relative">
+                    <div key={generation} className="mb-8 relative">
+                      <div className="flex justify-center gap-3 sm:gap-4 relative">
                     {members.map((member, idx) => {
                       const calculateAge = (birthDate: string, deathDate?: string) => {
                         const birth = new Date(birthDate);
@@ -478,27 +478,27 @@ export function FamilyTabsContent({
                             className="relative group cursor-pointer"
                             onClick={() => setSelectedTreeMember(member)}
                           >
-                            <div className="bg-gradient-to-br from-amber-100 to-yellow-50 border-4 border-amber-700 rounded-lg p-4 shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 min-h-[140px] flex flex-col justify-between"
+                            <div className="bg-gradient-to-br from-amber-100 to-yellow-50 border-3 border-amber-700 rounded-lg p-2 sm:p-3 shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 min-h-[100px] sm:min-h-[110px] flex flex-col justify-between"
                               style={{
                                 backgroundImage: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
                                 boxShadow: '0 4px 6px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)',
                               }}
                             >
-                              <div className="absolute -top-2 -left-2 w-6 h-6 bg-amber-800 rounded-full border-2 border-amber-600"></div>
-                              <div className="absolute -top-2 -right-2 w-6 h-6 bg-amber-800 rounded-full border-2 border-amber-600"></div>
-                              <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-amber-800 rounded-full border-2 border-amber-600"></div>
-                              <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-amber-800 rounded-full border-2 border-amber-600"></div>
+                              <div className="absolute -top-1 -left-1 w-4 h-4 bg-amber-800 rounded-full border-2 border-amber-600"></div>
+                              <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-800 rounded-full border-2 border-amber-600"></div>
+                              <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-amber-800 rounded-full border-2 border-amber-600"></div>
+                              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-amber-800 rounded-full border-2 border-amber-600"></div>
                               
                               <div className="text-center">
-                                <div className="text-4xl mb-2">{member.avatar}</div>
-                                <p className="font-bold text-sm text-amber-900" style={{ fontFamily: 'Georgia, serif' }}>
+                                <div className="text-2xl sm:text-3xl mb-1">{member.avatar}</div>
+                                <p className="font-bold text-xs sm:text-sm text-amber-900" style={{ fontFamily: 'Georgia, serif' }}>
                                   {member.firstName}
                                 </p>
-                                <p className="text-xs text-amber-800 italic">
+                                <p className="text-[10px] sm:text-xs text-amber-800 italic">
                                   {years}
                                 </p>
                                 {member.occupation && (
-                                  <p className="text-xs text-amber-700 mt-1">
+                                  <p className="text-[10px] sm:text-xs text-amber-700 mt-0.5 truncate">
                                     {member.occupation}
                                   </p>
                                 )}
@@ -514,7 +514,7 @@ export function FamilyTabsContent({
                             </div>
                             
                             {generation < 2 && (
-                              <div className="absolute left-1/2 -bottom-8 w-0.5 h-8 bg-amber-700 transform -translate-x-1/2"></div>
+                              <div className="absolute left-1/2 -bottom-6 w-0.5 h-6 bg-amber-700 transform -translate-x-1/2"></div>
                             )}
                           </div>
                         </div>
@@ -526,7 +526,7 @@ export function FamilyTabsContent({
                         <div 
                           className="absolute left-0 right-0 h-0.5 bg-amber-700"
                           style={{ 
-                            top: 'calc(140px + 16px)',
+                            top: 'calc(100px + 12px)',
                             left: `${100 / members.length / 2}%`,
                             right: `${100 / members.length / 2}%`,
                           }}
