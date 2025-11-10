@@ -70,6 +70,8 @@ export default function Index() {
   });
   const [showThemeSelector, setShowThemeSelector] = useState(false);
   const [showProjectInfo, setShowProjectInfo] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [welcomeText, setWelcomeText] = useState('');
 
   useEffect(() => {
     const newReminders: Reminder[] = tasks
@@ -85,13 +87,36 @@ export default function Index() {
   }, [tasks]);
 
   useEffect(() => {
+    const fullText = "Добро пожаловать в Семейный Органайзер! Место, где ваша семья становится командой.";
+    let currentIndex = 0;
+    
+    const typingTimer = setInterval(() => {
+      if (currentIndex <= fullText.length) {
+        setWelcomeText(fullText.slice(0, currentIndex));
+        currentIndex++;
+      } else {
+        clearInterval(typingTimer);
+      }
+    }, 50);
+    
+    const hideTimer = setTimeout(() => {
+      setShowWelcome(false);
+    }, 9000);
+
+    return () => {
+      clearInterval(typingTimer);
+      clearTimeout(hideTimer);
+    };
+  }, []);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
       setShowProjectInfo(true);
-    }, 1500);
+    }, 10000);
 
     const hideTimer = setTimeout(() => {
       setShowProjectInfo(false);
-    }, 8000);
+    }, 18000);
 
     return () => {
       clearTimeout(timer);
@@ -353,8 +378,49 @@ export default function Index() {
   const totalTasks = tasks.length;
 
   return (
-    <div className={`min-h-screen ${themeClasses.background} p-4 lg:p-8 ${themeClasses.baseFont} transition-all duration-700 ease-in-out`}>
-      <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
+    <>
+      {showWelcome && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-orange-100 via-pink-100 to-purple-100 animate-fade-in">
+          <div className="absolute inset-0 bg-white/40 backdrop-blur-sm"></div>
+          
+          <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+            <div className="mb-8 animate-bounce-slow">
+              <div className="text-9xl mb-4">👨‍👩‍👧‍👦</div>
+            </div>
+            
+            <div className="space-y-6">
+              <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-orange-600 via-pink-600 to-purple-600 bg-clip-text text-transparent mb-6 animate-fade-in">
+                Семейный Органайзер
+              </h1>
+              
+              <div className="min-h-[120px] flex items-center justify-center">
+                <p className="text-2xl md:text-3xl text-gray-700 font-medium leading-relaxed">
+                  {welcomeText}
+                  <span className="inline-block w-1 h-8 bg-purple-600 ml-1 animate-pulse"></span>
+                </p>
+              </div>
+              
+              <div className="flex justify-center gap-4 mt-12 animate-fade-in" style={{ animationDelay: '3s' }}>
+                <div className="flex items-center gap-2 text-orange-600">
+                  <Icon name="Heart" className="animate-pulse" size={24} />
+                  <span className="text-lg font-semibold">Любовь</span>
+                </div>
+                <div className="flex items-center gap-2 text-pink-600">
+                  <Icon name="Users" className="animate-pulse" size={24} style={{ animationDelay: '0.2s' }} />
+                  <span className="text-lg font-semibold">Команда</span>
+                </div>
+                <div className="flex items-center gap-2 text-purple-600">
+                  <Icon name="Sparkles" className="animate-pulse" size={24} style={{ animationDelay: '0.4s' }} />
+                  <span className="text-lg font-semibold">Традиции</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <div className={`min-h-screen ${themeClasses.background} p-4 lg:p-8 ${themeClasses.baseFont} transition-all duration-700 ease-in-out`}>
+        <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
         <Card className="border-2 border-blue-300 bg-gradient-to-r from-blue-50 to-cyan-50 animate-fade-in">
           <CardContent className="py-6">
             <div className="text-center mb-4">
@@ -732,5 +798,6 @@ export default function Index() {
         </div>
       </div>
     </div>
+    </>
   );
 }
