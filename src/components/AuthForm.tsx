@@ -47,30 +47,40 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
     setIsLoading(true);
     
     try {
+      const requestBody = {
+        email: registerMethod === 'email' ? registerData.email : undefined,
+        phone: registerMethod === 'phone' ? registerData.phone : undefined,
+        password: registerData.password,
+        family_name: registerData.familyName || undefined
+      };
+      
+      console.log('Попытка регистрации:', { method: registerMethod, credential });
+      
       const response = await fetch('https://functions.poehali.dev/b9b956c8-e2a6-4c20-aef8-b8422e8cb3b0?action=register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          email: registerMethod === 'email' ? registerData.email : undefined,
-          phone: registerMethod === 'phone' ? registerData.phone : undefined,
-          password: registerData.password,
-          family_name: registerData.familyName || undefined
-        })
+        body: JSON.stringify(requestBody)
       });
       
+      console.log('Статус регистрации:', response.status);
+      
       const data = await response.json();
+      console.log('Данные регистрации:', data);
       
       if (data.error) {
         setError(data.error);
+        console.error('Ошибка регистрации:', data.error);
       } else {
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
+        console.log('Успешная регистрация, переход к настройке');
         onAuthSuccess(data.token, data.user);
       }
     } catch (err) {
-      setError('Ошибка при регистрации');
+      console.error('Исключение при регистрации:', err);
+      setError('Ошибка при регистрации: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setIsLoading(false);
     }
@@ -82,6 +92,8 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
     setIsLoading(true);
     
     try {
+      console.log('Попытка входа с данными:', { login: loginData.login });
+      
       const response = await fetch('https://functions.poehali.dev/b9b956c8-e2a6-4c20-aef8-b8422e8cb3b0?action=login', {
         method: 'POST',
         headers: {
@@ -90,17 +102,23 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
         body: JSON.stringify(loginData)
       });
       
+      console.log('Статус ответа:', response.status);
+      
       const data = await response.json();
+      console.log('Данные ответа:', data);
       
       if (data.error) {
         setError(data.error);
+        console.error('Ошибка входа:', data.error);
       } else {
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
+        console.log('Успешный вход, токен сохранён');
         onAuthSuccess(data.token, data.user);
       }
     } catch (err) {
-      setError('Ошибка при входе');
+      console.error('Исключение при входе:', err);
+      setError('Ошибка при входе: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setIsLoading(false);
     }
