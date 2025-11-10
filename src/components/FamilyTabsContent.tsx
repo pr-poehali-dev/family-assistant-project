@@ -53,7 +53,7 @@ interface FamilyTabsContentProps {
   selectedUserId: string;
   newMessage: string;
   setNewMessage: React.Dispatch<React.SetStateAction<string>>;
-  toggleTask: (taskId: string) => void;
+  toggleTask: (taskId: string) => void | Promise<any>;
   addPoints: (assignee: string, points: number) => void;
   getWorkloadColor: (workload: number) => string;
   getMemberById: (id: string) => FamilyMember | undefined;

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
+import { useTasks } from '@/hooks/useTasks';
 import type {
   FamilyMember,
   Task,
@@ -26,7 +27,6 @@ import type {
 import { themes, getThemeClasses } from '@/config/themes';
 import {
   initialFamilyMembers,
-  initialTasks,
   initialChildrenProfiles,
   initialDevelopmentPlans,
   initialImportantDates,
@@ -58,7 +58,8 @@ export default function Index({ onLogout }: IndexProps) {
     const saved = localStorage.getItem('familyMembers');
     return saved ? JSON.parse(saved) : initialFamilyMembers;
   });
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  
+  const { tasks, loading: tasksLoading, toggleTask: toggleTaskDB, createTask, updateTask, deleteTask } = useTasks();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [importantDates] = useState<ImportantDate[]>(initialImportantDates);
   const [familyValues] = useState<FamilyValue[]>(initialFamilyValues);
@@ -157,37 +158,15 @@ export default function Index({ onLogout }: IndexProps) {
     return () => clearInterval(interval);
   }, [reminders]);
 
-  const toggleTask = (taskId: string) => {
-    setTasks(prevTasks => {
-      return prevTasks.map(task => {
-        if (task.id === taskId) {
-          const newCompleted = !task.completed;
-          
-          if (newCompleted) {
-            addPoints(task.assignee, task.points);
-            
-            if (task.isRecurring && task.recurringPattern) {
-              const nextDate = getNextOccurrenceDate(task);
-              if (nextDate) {
-                const newTask: Task = {
-                  ...task,
-                  id: `${task.id}-${Date.now()}`,
-                  completed: false,
-                  nextOccurrence: nextDate,
-                };
-                
-                setTimeout(() => {
-                  setTasks(prev => [...prev, newTask]);
-                }, 100);
-              }
-            }
-          }
-          
-          return { ...task, completed: newCompleted };
-        }
-        return task;
-      });
-    });
+  const toggleTask = async (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    
+    const result = await toggleTaskDB(taskId);
+    
+    if (result?.success && !task.completed && task.assignee_id) {
+      addPoints(task.assignee_id, task.points);
+    }
   };
 
   const getNextOccurrenceDate = (task: Task): string | undefined => {
