@@ -45,7 +45,10 @@ import {
 import { FamilyTabsContent } from '@/components/FamilyTabsContent';
 
 export default function Index() {
-  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>(initialFamilyMembers);
+  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>(() => {
+    const saved = localStorage.getItem('familyMembers');
+    return saved ? JSON.parse(saved) : initialFamilyMembers;
+  });
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [importantDates] = useState<ImportantDate[]>(initialImportantDates);
@@ -71,6 +74,10 @@ export default function Index() {
   const [showThemeSelector, setShowThemeSelector] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
   const [welcomeText, setWelcomeText] = useState('');
+
+  useEffect(() => {
+    localStorage.setItem('familyMembers', JSON.stringify(familyMembers));
+  }, [familyMembers]);
 
   useEffect(() => {
     const newReminders: Reminder[] = tasks

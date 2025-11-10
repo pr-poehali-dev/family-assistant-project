@@ -7,6 +7,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
+import { AddFamilyMemberForm } from '@/components/AddFamilyMemberForm';
+import { useState } from 'react';
 import type {
   FamilyMember,
   Task,
@@ -202,9 +204,47 @@ export function FamilyTabsContent({
     }
   };
 
+  const [addMemberDialogOpen, setAddMemberDialogOpen] = useState(false);
+  const [editingMember, setEditingMember] = useState<FamilyMember | undefined>(undefined);
+
   return (
     <>
       <TabsContent value="members" className="space-y-4">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-2xl font-bold">Члены семьи</h3>
+          <Dialog open={addMemberDialogOpen} onOpenChange={setAddMemberDialogOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                className="bg-gradient-to-r from-orange-500 to-pink-500"
+                onClick={() => {
+                  setEditingMember(undefined);
+                  setAddMemberDialogOpen(true);
+                }}
+              >
+                <Icon name="UserPlus" className="mr-2" size={16} />
+                Добавить члена семьи
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>{editingMember ? 'Редактировать члена семьи' : 'Добавить нового члена семьи'}</DialogTitle>
+              </DialogHeader>
+              <AddFamilyMemberForm 
+                editingMember={editingMember}
+                onSubmit={(newMember) => {
+                  if (editingMember) {
+                    setFamilyMembers(familyMembers.map(m => m.id === newMember.id ? newMember : m));
+                  } else {
+                    setFamilyMembers([...familyMembers, newMember]);
+                  }
+                  setAddMemberDialogOpen(false);
+                  setEditingMember(undefined);
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {familyMembers.map((member, index) => (
             <Card 
@@ -343,6 +383,34 @@ export function FamilyTabsContent({
                         {achievement === 'storyteller' && '📖 Рассказчик'}
                       </Badge>
                     ))}
+                  </div>
+                  
+                  <div className="flex gap-2 mt-4 pt-3 border-t">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => {
+                        setEditingMember(member);
+                        setAddMemberDialogOpen(true);
+                      }}
+                    >
+                      <Icon name="Edit" size={14} className="mr-1" />
+                      Редактировать
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-red-600 hover:bg-red-50 border-red-300"
+                      onClick={() => {
+                        if (confirm(`Удалить ${member.name} из семьи?`)) {
+                          setFamilyMembers(familyMembers.filter(m => m.id !== member.id));
+                        }
+                      }}
+                    >
+                      <Icon name="Trash2" size={14} className="mr-1" />
+                      Удалить
+                    </Button>
                   </div>
                 </div>
               </CardContent>
