@@ -352,43 +352,41 @@ export function FamilyTabsContent({
       </TabsContent>
 
       <TabsContent value="tree" className="space-y-6">
-        <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-3xl flex items-center gap-3">
-                <Icon name="Network" className="text-emerald-600" size={32} />
-                Семейное древо
-              </CardTitle>
-              <Button className="bg-gradient-to-r from-emerald-500 to-teal-500">
-                <Icon name="Plus" className="mr-2" size={16} />
-                Добавить члена семьи
-              </Button>
+        <Card className="border-amber-200 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 overflow-hidden">
+          <CardHeader className="relative">
+            <div 
+              className="absolute inset-0 opacity-10 bg-cover bg-center"
+              style={{ 
+                backgroundImage: `url('https://cdn.poehali.dev/files/ba8358f6-677b-47af-960b-3b5598f27d5b.jpeg')`,
+                filter: 'blur(2px)'
+              }}
+            ></div>
+            <div className="relative z-10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-4xl font-bold flex items-center gap-3 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                    <Icon name="TreePine" className="text-amber-700" size={40} />
+                    Генеалогическое Древо Семьи
+                  </CardTitle>
+                  <p className="text-amber-800 italic">История рода в поколениях</p>
+                </div>
+                <Button className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700">
+                  <Icon name="Plus" className="mr-2" size={16} />
+                  Добавить
+                </Button>
+              </div>
             </div>
-            <p className="text-muted-foreground mt-2">
-              История вашей семьи в 4 поколениях
-            </p>
           </CardHeader>
-          <CardContent>
-            {[0, 1, 2].map(generation => {
-              const members = familyTree.filter(m => m.generation === generation);
-              if (members.length === 0) return null;
-              
-              return (
-                <div key={generation} className="mb-8">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Badge className="bg-gradient-to-r from-emerald-500 to-teal-500 text-lg px-4 py-2">
-                      {generation === 0 && '👴👵 Бабушки и дедушки'}
-                      {generation === 1 && '👫 Родители'}
-                      {generation === 2 && '👶 Дети'}
-                    </Badge>
-                    <div className="h-px flex-1 bg-gradient-to-r from-emerald-300 to-transparent"></div>
-                  </div>
+          <CardContent className="p-8 relative">
+            <div className="relative overflow-x-auto pb-8">
+              <div className="min-w-[900px] mx-auto">
+                {[0, 1, 2].map(generation => {
+                  const members = familyTree.filter(m => m.generation === generation);
+                  if (members.length === 0) return null;
                   
-                  <div className={`grid gap-4 ${
-                    generation === 0 ? 'grid-cols-1 md:grid-cols-2' :
-                    generation === 1 ? 'grid-cols-1 md:grid-cols-2' :
-                    'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                  }`}>
+                  return (
+                    <div key={generation} className="mb-12 relative">
+                      <div className="flex justify-center gap-6 relative">
                     {members.map((member, idx) => {
                       const calculateAge = (birthDate: string, deathDate?: string) => {
                         const birth = new Date(birthDate);
@@ -406,70 +404,70 @@ export function FamilyTabsContent({
                         : `${age} ${age % 10 === 1 && age !== 11 ? 'год' : age % 10 >= 2 && age % 10 <= 4 && (age < 10 || age > 20) ? 'года' : 'лет'}`;
 
                       return (
-                        <Card 
-                          key={member.id}
-                          className="animate-fade-in hover:shadow-xl transition-all cursor-pointer border-2 border-emerald-200 hover:border-emerald-400 overflow-hidden group"
-                          style={{ animationDelay: `${idx * 0.1}s` }}
-                          onClick={() => setSelectedTreeMember(member)}
-                        >
-                          <div className="relative">
-                            <div className="h-32 bg-gradient-to-br from-emerald-200 via-teal-200 to-cyan-200 flex items-center justify-center">
-                              {member.photo ? (
-                                <img src={member.photo} alt={member.fullName} className="h-24 w-24 rounded-full object-cover border-4 border-white shadow-lg" />
-                              ) : (
-                                <div className="text-7xl group-hover:scale-110 transition-transform">{member.avatar}</div>
-                              )}
-                            </div>
-                            {member.deathDate && (
-                              <Badge className="absolute top-2 right-2 bg-gray-600 text-white">
-                                <Icon name="Cross" size={12} className="mr-1" />
-                                Память
-                              </Badge>
-                            )}
-                          </div>
-                          
-                          <CardHeader className="pb-2">
-                            <CardTitle className="text-lg">{member.fullName}</CardTitle>
-                            <p className="text-sm text-muted-foreground">{years}</p>
-                            <p className="text-xs text-emerald-600 font-semibold">{ageText}</p>
-                          </CardHeader>
-                          
-                          <CardContent>
-                            {member.occupation && (
-                              <div className="flex items-center gap-2 mb-2">
-                                <Icon name="Briefcase" size={14} className="text-emerald-600" />
-                                <span className="text-sm">{member.occupation}</span>
-                              </div>
-                            )}
-                            {member.placeOfBirth && (
-                              <div className="flex items-center gap-2 mb-2">
-                                <Icon name="MapPin" size={14} className="text-emerald-600" />
-                                <span className="text-sm text-muted-foreground">{member.placeOfBirth}</span>
-                              </div>
-                            )}
-                            
-                            {member.achievements && member.achievements.length > 0 && (
-                              <div className="mt-3 flex flex-wrap gap-1">
-                                {member.achievements.slice(0, 2).map((achievement, i) => (
-                                  <Badge key={i} variant="secondary" className="text-xs">
-                                    {achievement}
-                                  </Badge>
-                                ))}
-                                {member.achievements.length > 2 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    +{member.achievements.length - 2}
-                                  </Badge>
+                        <div key={member.id} className="flex-1 relative">
+                          <div 
+                            className="relative group cursor-pointer"
+                            onClick={() => setSelectedTreeMember(member)}
+                          >
+                            <div className="bg-gradient-to-br from-amber-100 to-yellow-50 border-4 border-amber-700 rounded-lg p-4 shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 min-h-[140px] flex flex-col justify-between"
+                              style={{
+                                backgroundImage: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                                boxShadow: '0 4px 6px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)',
+                              }}
+                            >
+                              <div className="absolute -top-2 -left-2 w-6 h-6 bg-amber-800 rounded-full border-2 border-amber-600"></div>
+                              <div className="absolute -top-2 -right-2 w-6 h-6 bg-amber-800 rounded-full border-2 border-amber-600"></div>
+                              <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-amber-800 rounded-full border-2 border-amber-600"></div>
+                              <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-amber-800 rounded-full border-2 border-amber-600"></div>
+                              
+                              <div className="text-center">
+                                <div className="text-4xl mb-2">{member.avatar}</div>
+                                <p className="font-bold text-sm text-amber-900" style={{ fontFamily: 'Georgia, serif' }}>
+                                  {member.firstName}
+                                </p>
+                                <p className="text-xs text-amber-800 italic">
+                                  {years}
+                                </p>
+                                {member.occupation && (
+                                  <p className="text-xs text-amber-700 mt-1">
+                                    {member.occupation}
+                                  </p>
                                 )}
                               </div>
+                              
+                              {member.deathDate && (
+                                <div className="absolute top-1 right-1">
+                                  <Badge className="bg-gray-700 text-white text-xs px-1 py-0">
+                                    ✝
+                                  </Badge>
+                                </div>
+                              )}
+                            </div>
+                            
+                            {generation < 2 && (
+                              <div className="absolute left-1/2 -bottom-8 w-0.5 h-8 bg-amber-700 transform -translate-x-1/2"></div>
                             )}
-                          </CardContent>
-                        </Card>
+                          </div>
+                        </div>
                       );
                     })}
-                  </div>
-                </div>
-              );
-            })}
+                      </div>
+                      
+                      {generation < 2 && members.length > 1 && (
+                        <div 
+                          className="absolute left-0 right-0 h-0.5 bg-amber-700"
+                          style={{ 
+                            top: 'calc(140px + 16px)',
+                            left: `${100 / members.length / 2}%`,
+                            right: `${100 / members.length / 2}%`,
+                          }}
+                        ></div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </CardContent>
         </Card>
 
