@@ -50,8 +50,12 @@ interface IndexProps {
 }
 
 export default function Index({ onLogout }: IndexProps) {
-  const { members: familyMembers, loading: membersLoading, addMember, updateMember, deleteMember } = useFamilyMembers();
-  const { tasks, loading: tasksLoading, toggleTask: toggleTaskDB, createTask, updateTask, deleteTask } = useTasks();
+  const { members: familyMembersRaw, loading: membersLoading, addMember, updateMember, deleteMember } = useFamilyMembers();
+  const { tasks: tasksRaw, loading: tasksLoading, toggleTask: toggleTaskDB, createTask, updateTask, deleteTask } = useTasks();
+  
+  const familyMembers = familyMembersRaw || [];
+  const tasks = tasksRaw || [];
+  
   const [reminders, setReminders] = useState<Reminder[]>([]);
   
   const setFamilyMembers = (value: FamilyMember[] | ((prev: FamilyMember[]) => FamilyMember[])) => {
