@@ -52,6 +52,9 @@ const App = () => {
   }, []);
 
   const handleAuthSuccess = (token: string, user: any) => {
+    console.log('handleAuthSuccess вызван с пользователем:', user);
+    console.log('family_id:', user.family_id);
+    console.log('needsSetup будет установлен в:', !user.family_id);
     setCurrentUser(user);
     setIsAuthenticated(true);
     setNeedsSetup(!user.family_id);
