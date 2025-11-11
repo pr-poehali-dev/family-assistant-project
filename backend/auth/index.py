@@ -1,6 +1,6 @@
 """
-Business: Регистрация и авторизация пользователей через email/телефон
-Args: event с httpMethod, body (email/phone, password)
+Business: Регистрация и авторизация пользователей только через телефон
+Args: event с httpMethod, body (phone, password)
 Returns: JSON с токеном сессии или ошибкой
 """
 
@@ -23,16 +23,23 @@ def hash_password(password: str) -> str:
 def generate_token() -> str:
     return secrets.token_urlsafe(32)
 
-def validate_email(email: str) -> bool:
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    return bool(re.match(pattern, email))
-
 def validate_phone(phone: str) -> bool:
     cleaned = re.sub(r'[^\d+]', '', phone)
     return len(cleaned) >= 10 and len(cleaned) <= 15
 
+def escape_string(value: Any) -> str:
+    if value is None:
+        return 'NULL'
+    if isinstance(value, (int, float)):
+        return str(value)
+    if isinstance(value, bool):
+        return 'TRUE' if value else 'FALSE'
+    return "'" + str(value).replace("'", "''") + "'"
+
 def get_db_connection():
-    return psycopg2.connect(DATABASE_URL)
+    conn = psycopg2.connect(DATABASE_URL)
+    conn.autocommit = True
+    return conn
 
 def register_user(phone: str, password: str, family_name: Optional[str] = None) -> Dict[str, Any]:
     if not phone:
@@ -50,48 +57,60 @@ def register_user(phone: str, password: str, family_name: Optional[str] = None) 
     try:
         password_hash = hash_password(password)
         
-        cur.execute(f"SELECT id FROM {SCHEMA}.users WHERE phone = %s", (phone,))
+        check_query = f"SELECT id FROM {SCHEMA}.users WHERE phone = {escape_string(phone)}"
+        cur.execute(check_query)
         if cur.fetchone():
             cur.close()
             conn.close()
             return {'error': 'Телефон уже зарегистрирован'}
         
-        cur.execute(
-            f"INSERT INTO {SCHEMA}.users (email, phone, password_hash, is_verified) VALUES (%s, %s, %s, %s) RETURNING id, email, phone, created_at",
-            (None, phone, password_hash, True)
-        )
+        insert_user = f"""
+            INSERT INTO {SCHEMA}.users (email, phone, password_hash, is_verified) 
+            VALUES (NULL, {escape_string(phone)}, {escape_string(password_hash)}, TRUE) 
+            RETURNING id, email, phone, created_at
+        """
+        cur.execute(insert_user)
         user = cur.fetchone()
-        conn.commit()
         
         default_family_name = family_name or f"Семья {phone}"
-        cur.execute(
-            f"INSERT INTO {SCHEMA}.families (name) VALUES (%s) RETURNING id, name",
-            (default_family_name,)
-        )
+        insert_family = f"""
+            INSERT INTO {SCHEMA}.families (name) 
+            VALUES ({escape_string(default_family_name)}) 
+            RETURNING id, name
+        """
+        cur.execute(insert_family)
         family = cur.fetchone()
-        conn.commit()
         
         member_name = phone[-4:]
-        cur.execute(
-            f"""
+        insert_member = f"""
             INSERT INTO {SCHEMA}.family_members 
             (family_id, user_id, name, role, points, level, workload, avatar, avatar_type) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (
+                {escape_string(family['id'])}, 
+                {escape_string(user['id'])}, 
+                {escape_string(member_name)}, 
+                {escape_string('Владелец')}, 
+                0, 1, 0, 
+                {escape_string('👤')}, 
+                {escape_string('emoji')}
+            )
             RETURNING id
-            """,
-            (family['id'], user['id'], member_name, 'Владелец', 0, 1, 0, '👤', 'emoji')
-        )
+        """
+        cur.execute(insert_member)
         member = cur.fetchone()
-        conn.commit()
         
         token = generate_token()
         expires_at = datetime.now() + timedelta(days=30)
         
-        cur.execute(
-            f"INSERT INTO {SCHEMA}.sessions (user_id, token, expires_at) VALUES (%s, %s, %s)",
-            (user['id'], token, expires_at)
-        )
-        conn.commit()
+        insert_session = f"""
+            INSERT INTO {SCHEMA}.sessions (user_id, token, expires_at) 
+            VALUES (
+                {escape_string(user['id'])}, 
+                {escape_string(token)}, 
+                {escape_string(expires_at.isoformat())}
+            )
+        """
+        cur.execute(insert_session)
         
         cur.close()
         conn.close()
@@ -109,7 +128,6 @@ def register_user(phone: str, password: str, family_name: Optional[str] = None) 
             }
         }
     except Exception as e:
-        conn.rollback()
         cur.close()
         conn.close()
         return {'error': f'Ошибка регистрации: {str(e)}'}
@@ -118,114 +136,142 @@ def login_user(login: str, password: str) -> Dict[str, Any]:
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
     
-    is_email = '@' in login
-    field = 'email' if is_email else 'phone'
-    
-    cur.execute(
-        f"SELECT id, email, phone, password_hash FROM {SCHEMA}.users WHERE {field} = %s",
-        (login,)
-    )
-    user = cur.fetchone()
-    
-    if not user:
+    try:
+        is_email = '@' in login
+        field = 'email' if is_email else 'phone'
+        
+        select_user = f"""
+            SELECT id, email, phone, password_hash 
+            FROM {SCHEMA}.users 
+            WHERE {field} = {escape_string(login)}
+        """
+        cur.execute(select_user)
+        user = cur.fetchone()
+        
+        if not user:
+            cur.close()
+            conn.close()
+            return {'error': 'Пользователь не найден'}
+        
+        password_hash = hash_password(password)
+        if user['password_hash'] != password_hash:
+            cur.close()
+            conn.close()
+            return {'error': 'Неверный пароль'}
+        
+        select_family = f"""
+            SELECT fm.family_id, f.name as family_name, fm.id as member_id
+            FROM {SCHEMA}.family_members fm
+            JOIN {SCHEMA}.families f ON fm.family_id = f.id
+            WHERE fm.user_id = {escape_string(user['id'])}
+            LIMIT 1
+        """
+        cur.execute(select_family)
+        family_info = cur.fetchone()
+        
+        token = generate_token()
+        expires_at = datetime.now() + timedelta(days=30)
+        
+        insert_session = f"""
+            INSERT INTO {SCHEMA}.sessions (user_id, token, expires_at) 
+            VALUES (
+                {escape_string(user['id'])}, 
+                {escape_string(token)}, 
+                {escape_string(expires_at.isoformat())}
+            )
+        """
+        cur.execute(insert_session)
+        
+        update_login = f"""
+            UPDATE {SCHEMA}.users 
+            SET last_login_at = CURRENT_TIMESTAMP 
+            WHERE id = {escape_string(user['id'])}
+        """
+        cur.execute(update_login)
+        
         cur.close()
         conn.close()
-        return {'error': 'Пользователь не найден'}
-    
-    password_hash = hash_password(password)
-    if user['password_hash'] != password_hash:
+        
+        user_data = {
+            'id': str(user['id']),
+            'email': user['email'],
+            'phone': user['phone']
+        }
+        
+        if family_info:
+            user_data['family_id'] = str(family_info['family_id'])
+            user_data['family_name'] = family_info['family_name']
+            user_data['member_id'] = str(family_info['member_id'])
+        
+        return {
+            'success': True,
+            'token': token,
+            'user': user_data
+        }
+    except Exception as e:
         cur.close()
         conn.close()
-        return {'error': 'Неверный пароль'}
-    
-    cur.execute(
-        f"""
-        SELECT fm.family_id, f.name as family_name, fm.id as member_id
-        FROM {SCHEMA}.family_members fm
-        JOIN {SCHEMA}.families f ON fm.family_id = f.id
-        WHERE fm.user_id = %s
-        LIMIT 1
-        """,
-        (user['id'],)
-    )
-    family_info = cur.fetchone()
-    
-    token = generate_token()
-    expires_at = datetime.now() + timedelta(days=30)
-    
-    cur.execute(
-        f"INSERT INTO {SCHEMA}.sessions (user_id, token, expires_at) VALUES (%s, %s, %s)",
-        (user['id'], token, expires_at)
-    )
-    conn.commit()
-    
-    cur.execute(
-        f"UPDATE {SCHEMA}.users SET last_login_at = CURRENT_TIMESTAMP WHERE id = %s",
-        (user['id'],)
-    )
-    conn.commit()
-    
-    cur.close()
-    conn.close()
-    
-    user_data = {
-        'id': str(user['id']),
-        'email': user['email'],
-        'phone': user['phone']
-    }
-    
-    if family_info:
-        user_data['family_id'] = str(family_info['family_id'])
-        user_data['family_name'] = family_info['family_name']
-        user_data['member_id'] = str(family_info['member_id'])
-    
-    return {
-        'success': True,
-        'token': token,
-        'user': user_data
-    }
+        return {'error': f'Ошибка входа: {str(e)}'}
 
 def verify_token(token: str) -> Optional[Dict[str, Any]]:
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
     
-    cur.execute(
-        f"""
-        SELECT s.user_id, s.expires_at, u.email, u.phone 
-        FROM {SCHEMA}.sessions s
-        JOIN {SCHEMA}.users u ON s.user_id = u.id
-        WHERE s.token = %s AND s.expires_at > CURRENT_TIMESTAMP
-        """,
-        (token,)
-    )
-    session = cur.fetchone()
-    
-    cur.close()
-    conn.close()
-    
-    if not session:
+    try:
+        select_session = f"""
+            SELECT s.user_id, s.expires_at, u.email, u.phone,
+                   fm.family_id, f.name as family_name, fm.id as member_id
+            FROM {SCHEMA}.sessions s
+            JOIN {SCHEMA}.users u ON s.user_id = u.id
+            LEFT JOIN {SCHEMA}.family_members fm ON fm.user_id = u.id
+            LEFT JOIN {SCHEMA}.families f ON f.id = fm.family_id
+            WHERE s.token = {escape_string(token)} AND s.expires_at > CURRENT_TIMESTAMP
+            LIMIT 1
+        """
+        cur.execute(select_session)
+        session = cur.fetchone()
+        
+        cur.close()
+        conn.close()
+        
+        if not session:
+            return None
+        
+        user_data = {
+            'id': str(session['user_id']),
+            'email': session['email'],
+            'phone': session['phone']
+        }
+        
+        if session.get('family_id'):
+            user_data['family_id'] = str(session['family_id'])
+            user_data['family_name'] = session['family_name']
+            user_data['member_id'] = str(session['member_id'])
+        
+        return user_data
+    except Exception as e:
+        cur.close()
+        conn.close()
         return None
-    
-    return {
-        'id': str(session['user_id']),
-        'email': session['email'],
-        'phone': session['phone']
-    }
 
 def logout_user(token: str) -> Dict[str, Any]:
     conn = get_db_connection()
     cur = conn.cursor()
     
-    cur.execute(
-        f"UPDATE {SCHEMA}.sessions SET expires_at = CURRENT_TIMESTAMP WHERE token = %s",
-        (token,)
-    )
-    conn.commit()
-    
-    cur.close()
-    conn.close()
-    
-    return {'success': True}
+    try:
+        update_session = f"""
+            UPDATE {SCHEMA}.sessions 
+            SET expires_at = CURRENT_TIMESTAMP 
+            WHERE token = {escape_string(token)}
+        """
+        cur.execute(update_session)
+        cur.close()
+        conn.close()
+        return {'success': True}
+    except Exception as e:
+        cur.close()
+        conn.close()
+        return {'error': str(e)}
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method = event.get('httpMethod', 'GET')
@@ -239,7 +285,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'Access-Control-Allow-Headers': 'Content-Type, X-Auth-Token',
                 'Access-Control-Max-Age': '86400'
             },
-            'body': ''
+            'body': '',
+            'isBase64Encoded': False
         }
     
     headers = {
@@ -262,12 +309,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 400,
                         'headers': headers,
-                        'body': json.dumps(result)
+                        'body': json.dumps(result),
+                        'isBase64Encoded': False
                     }
                 return {
                     'statusCode': 201,
                     'headers': headers,
-                    'body': json.dumps(result)
+                    'body': json.dumps(result),
+                    'isBase64Encoded': False
                 }
             
             elif path == 'login':
@@ -279,48 +328,55 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 401,
                         'headers': headers,
-                        'body': json.dumps(result)
+                        'body': json.dumps(result),
+                        'isBase64Encoded': False
                     }
                 return {
                     'statusCode': 200,
                     'headers': headers,
-                    'body': json.dumps(result)
+                    'body': json.dumps(result),
+                    'isBase64Encoded': False
                 }
             
             elif path == 'logout':
-                token = event.get('headers', {}).get('X-Auth-Token', '')
+                token = event.get('headers', {}).get('X-Auth-Token', '') or event.get('headers', {}).get('x-auth-token', '')
                 result = logout_user(token)
                 return {
                     'statusCode': 200,
                     'headers': headers,
-                    'body': json.dumps(result)
+                    'body': json.dumps(result),
+                    'isBase64Encoded': False
                 }
         
         elif method == 'GET':
             if path == 'verify':
-                token = event.get('headers', {}).get('X-Auth-Token', '')
+                token = event.get('headers', {}).get('X-Auth-Token', '') or event.get('headers', {}).get('x-auth-token', '')
                 user = verify_token(token)
                 if not user:
                     return {
                         'statusCode': 401,
                         'headers': headers,
-                        'body': json.dumps({'error': 'Недействительный токен'})
+                        'body': json.dumps({'error': 'Недействительный токен'}),
+                        'isBase64Encoded': False
                     }
                 return {
                     'statusCode': 200,
                     'headers': headers,
-                    'body': json.dumps({'success': True, 'user': user})
+                    'body': json.dumps({'success': True, 'user': user}),
+                    'isBase64Encoded': False
                 }
         
         return {
             'statusCode': 404,
             'headers': headers,
-            'body': json.dumps({'error': 'Метод не найден'})
+            'body': json.dumps({'error': 'Метод не найден'}),
+            'isBase64Encoded': False
         }
     
     except Exception as e:
         return {
             'statusCode': 500,
             'headers': headers,
-            'body': json.dumps({'error': str(e)})
+            'body': json.dumps({'error': str(e)}),
+            'isBase64Encoded': False
         }

@@ -27,7 +27,7 @@ export default function FamilySetup({ user, onSetupComplete }: FamilySetupProps)
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [profileData, setProfileData] = useState({
-    name: user.email?.split('@')[0] || user.phone?.slice(-4) || '',
+    name: user?.email?.split('@')[0] || (user?.phone ? user.phone.slice(-4) : '') || 'Пользователь',
     role: 'Владелец',
     relationship: '',
     customRelationship: '',
