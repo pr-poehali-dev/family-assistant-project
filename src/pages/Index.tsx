@@ -428,23 +428,23 @@ export default function Index({ onLogout }: IndexProps) {
         <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
         <header className="text-center mb-8 relative">
           <div className="flex justify-between items-start mb-4 lg:mb-0">
-            <div className="lg:absolute lg:top-0 lg:left-4 flex flex-col gap-2">
+            <div className="lg:absolute lg:top-0 lg:left-4 flex flex-col gap-1.5">
               <Button
                 onClick={handleLogoutLocal}
                 variant="outline"
-                className="border-2 border-orange-300 hover:bg-orange-50"
+                className="border border-orange-300 hover:bg-orange-50 h-8 px-2 text-xs"
                 size="sm"
               >
-                <Icon name="LogOut" className="mr-2" size={16} />
-                Выход ({currentUser?.name || 'Пользователь'})
+                <Icon name="LogOut" className="mr-1" size={14} />
+                Выход
               </Button>
               <Button
                 onClick={() => navigate('/instructions')}
                 variant="outline"
-                className="border-2 border-blue-300 hover:bg-blue-50"
+                className="border border-blue-300 hover:bg-blue-50 h-8 px-2 text-xs"
                 size="sm"
               >
-                <Icon name="BookOpen" className="mr-2" size={16} />
+                <Icon name="BookOpen" className="mr-1" size={14} />
                 Инструкции
               </Button>
               <SettingsMenu />

@@ -97,10 +97,10 @@ export default function SettingsMenu() {
       <Button
         onClick={() => setIsOpen(true)}
         variant="outline"
-        className="border-2 border-blue-300 hover:bg-blue-50"
+        className="border border-blue-300 hover:bg-blue-50 h-8 px-2 text-xs"
         size="sm"
       >
-        <Icon name="Settings" className="mr-2" size={16} />
+        <Icon name="Settings" className="mr-1" size={14} />
         Настройки
       </Button>
 
