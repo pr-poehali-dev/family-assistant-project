@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import Icon from '@/components/ui/icon';
 import { useNavigate } from 'react-router-dom';
 import { useTasks } from '@/hooks/useTasks';
@@ -602,6 +603,25 @@ export default function Index({ onLogout }: IndexProps) {
                   <Icon name="Network" className="mr-1" size={14} />
                   Древо
                 </TabsTrigger>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={() => navigate('/garage')}
+                      variant="outline"
+                      className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap border-amber-300 bg-amber-50 hover:bg-amber-100 relative"
+                    >
+                      <Icon name="Car" className="mr-1" size={14} />
+                      Гараж
+                      <Badge className="ml-2 bg-amber-500 text-white text-[10px] px-1 py-0">
+                        DEV
+                      </Badge>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="font-medium">🚧 Раздел в разработке</p>
+                    <p className="text-xs text-muted-foreground">Нажмите чтобы узнать подробнее</p>
+                  </TooltipContent>
+                </Tooltip>
                 <TabsTrigger value="traditions" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
                   <Icon name="Calendar" className="mr-1" size={14} />
                   Традиции
