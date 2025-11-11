@@ -26,8 +26,17 @@ const RELATIONSHIPS = [
 export default function FamilySetup({ user, onSetupComplete }: FamilySetupProps) {
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  
+  const getDefaultName = () => {
+    if (user?.email) return user.email.split('@')[0];
+    if (user?.phone && typeof user.phone === 'string' && user.phone.length >= 4) {
+      return user.phone.slice(-4);
+    }
+    return 'Пользователь';
+  };
+  
   const [profileData, setProfileData] = useState({
-    name: user?.email?.split('@')[0] || (user?.phone ? user.phone.slice(-4) : '') || 'Пользователь',
+    name: getDefaultName(),
     role: 'Владелец',
     relationship: '',
     customRelationship: '',
