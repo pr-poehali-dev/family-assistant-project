@@ -608,13 +608,11 @@ export default function Index({ onLogout }: IndexProps) {
                     <Button
                       onClick={() => navigate('/garage')}
                       variant="outline"
-                      className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap border-amber-300 bg-amber-50 hover:bg-amber-100 relative"
+                      className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap border-amber-300 bg-amber-50 hover:bg-amber-100"
                     >
                       <Icon name="Car" className="mr-1" size={14} />
                       Гараж
-                      <Badge className="ml-2 bg-amber-500 text-white text-[10px] px-1 py-0">
-                        DEV
-                      </Badge>
+                      <Badge className="ml-2 bg-amber-500 text-white text-[10px] px-1 py-0">DEV</Badge>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -622,6 +620,97 @@ export default function Index({ onLogout }: IndexProps) {
                     <p className="text-xs text-muted-foreground">Нажмите чтобы узнать подробнее</p>
                   </TooltipContent>
                 </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={() => navigate('/health')}
+                      variant="outline"
+                      className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap border-amber-300 bg-amber-50 hover:bg-amber-100"
+                    >
+                      <Icon name="Heart" className="mr-1" size={14} />
+                      Здоровье
+                      <Badge className="ml-2 bg-amber-500 text-white text-[10px] px-1 py-0">DEV</Badge>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="font-medium">🚧 Раздел в разработке</p>
+                    <p className="text-xs text-muted-foreground">Нажмите чтобы узнать подробнее</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={() => navigate('/finance')}
+                      variant="outline"
+                      className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap border-amber-300 bg-amber-50 hover:bg-amber-100"
+                    >
+                      <Icon name="Wallet" className="mr-1" size={14} />
+                      Финансы
+                      <Badge className="ml-2 bg-amber-500 text-white text-[10px] px-1 py-0">DEV</Badge>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="font-medium">🚧 Раздел в разработке</p>
+                    <p className="text-xs text-muted-foreground">Нажмите чтобы узнать подробнее</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={() => navigate('/education')}
+                      variant="outline"
+                      className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap border-amber-300 bg-amber-50 hover:bg-amber-100"
+                    >
+                      <Icon name="GraduationCap" className="mr-1" size={14} />
+                      Образование
+                      <Badge className="ml-2 bg-amber-500 text-white text-[10px] px-1 py-0">DEV</Badge>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="font-medium">🚧 Раздел в разработке</p>
+                    <p className="text-xs text-muted-foreground">Нажмите чтобы узнать подробнее</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={() => navigate('/travel')}
+                      variant="outline"
+                      className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap border-amber-300 bg-amber-50 hover:bg-amber-100"
+                    >
+                      <Icon name="Plane" className="mr-1" size={14} />
+                      Путешествия
+                      <Badge className="ml-2 bg-amber-500 text-white text-[10px] px-1 py-0">DEV</Badge>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="font-medium">🚧 Раздел в разработке</p>
+                    <p className="text-xs text-muted-foreground">Нажмите чтобы узнать подробнее</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={() => navigate('/pets')}
+                      variant="outline"
+                      className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap border-amber-300 bg-amber-50 hover:bg-amber-100"
+                    >
+                      <Icon name="PawPrint" className="mr-1" size={14} />
+                      Питомцы
+                      <Badge className="ml-2 bg-amber-500 text-white text-[10px] px-1 py-0">DEV</Badge>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="font-medium">🚧 Раздел в разработке</p>
+                    <p className="text-xs text-muted-foreground">Нажмите чтобы узнать подробнее</p>
+                  </TooltipContent>
+                </Tooltip>
+                
                 <TabsTrigger value="traditions" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
                   <Icon name="Calendar" className="mr-1" size={14} />
                   Традиции

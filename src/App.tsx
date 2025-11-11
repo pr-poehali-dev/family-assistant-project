@@ -8,6 +8,11 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Instructions from "./pages/Instructions";
 import Garage from "./pages/Garage";
+import Health from "./pages/Health";
+import Finance from "./pages/Finance";
+import Education from "./pages/Education";
+import Travel from "./pages/Travel";
+import Pets from "./pages/Pets";
 import NotFound from "./pages/NotFound";
 import AuthForm from "./components/AuthForm";
 import FamilySetup from "./components/FamilySetup";
@@ -108,6 +113,11 @@ const App = () => {
             />
             <Route path="/instructions" element={<Instructions />} />
             <Route path="/garage" element={<Garage />} />
+            <Route path="/health" element={<Health />} />
+            <Route path="/finance" element={<Finance />} />
+            <Route path="/education" element={<Education />} />
+            <Route path="/travel" element={<Travel />} />
+            <Route path="/pets" element={<Pets />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
