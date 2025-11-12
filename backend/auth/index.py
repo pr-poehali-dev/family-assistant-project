@@ -293,6 +293,167 @@ def logout_user(token: str) -> Dict[str, Any]:
         conn.close()
         return {'error': str(e)}
 
+def forgot_password(phone: str) -> Dict[str, Any]:
+    if not phone or not validate_phone(phone):
+        return {'error': 'Некорректный номер телефона'}
+    
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    
+    try:
+        # Проверяем существует ли пользователь
+        check_user = f"SELECT id FROM {SCHEMA}.users WHERE phone = {escape_string(phone)}"
+        cur.execute(check_user)
+        user = cur.fetchone()
+        
+        if not user:
+            cur.close()
+            conn.close()
+            return {'error': 'Пользователь с таким номером не найден'}
+        
+        # Генерируем 6-значный код
+        reset_code = ''.join([str(secrets.randbelow(10)) for _ in range(6)])
+        reset_token = generate_token()
+        expires_at = datetime.now() + timedelta(minutes=15)
+        
+        # Удаляем старые токены
+        delete_old = f"DELETE FROM {SCHEMA}.password_reset_tokens WHERE user_id = {escape_string(user['id'])}"
+        cur.execute(delete_old)
+        
+        # Сохраняем новый токен
+        insert_token = f"""
+            INSERT INTO {SCHEMA}.password_reset_tokens 
+            (user_id, token, code, expires_at) 
+            VALUES (
+                {escape_string(user['id'])}, 
+                {escape_string(reset_token)}, 
+                {escape_string(reset_code)}, 
+                {escape_string(expires_at.isoformat())}
+            )
+        """
+        cur.execute(insert_token)
+        
+        cur.close()
+        conn.close()
+        
+        # TODO: Отправить SMS с кодом reset_code
+        # Пока просто возвращаем код (для тестирования)
+        return {
+            'success': True, 
+            'message': 'Код подтверждения отправлен',
+            'code': reset_code  # Уберите это в продакшене!
+        }
+    except Exception as e:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+        return {'error': f'Ошибка: {str(e)}'}
+
+def verify_reset_code(phone: str, code: str) -> Dict[str, Any]:
+    if not phone or not code:
+        return {'error': 'Телефон и код обязательны'}
+    
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    
+    try:
+        check_query = f"""
+            SELECT prt.token, prt.expires_at
+            FROM {SCHEMA}.password_reset_tokens prt
+            JOIN {SCHEMA}.users u ON prt.user_id = u.id
+            WHERE u.phone = {escape_string(phone)} 
+            AND prt.code = {escape_string(code)}
+            AND prt.expires_at > CURRENT_TIMESTAMP
+            AND prt.used_at IS NULL
+            ORDER BY prt.created_at DESC
+            LIMIT 1
+        """
+        cur.execute(check_query)
+        token_data = cur.fetchone()
+        
+        cur.close()
+        conn.close()
+        
+        if not token_data:
+            return {'error': 'Неверный код или код устарел'}
+        
+        return {
+            'success': True,
+            'reset_token': token_data['token']
+        }
+    except Exception as e:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+        return {'error': f'Ошибка: {str(e)}'}
+
+def reset_password(reset_token: str, new_password: str) -> Dict[str, Any]:
+    if not reset_token or not new_password:
+        return {'error': 'Токен и пароль обязательны'}
+    
+    if len(new_password) < 6:
+        return {'error': 'Пароль должен быть минимум 6 символов'}
+    
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    
+    try:
+        # Проверяем токен
+        check_token = f"""
+            SELECT user_id 
+            FROM {SCHEMA}.password_reset_tokens 
+            WHERE token = {escape_string(reset_token)} 
+            AND expires_at > CURRENT_TIMESTAMP
+            AND used_at IS NULL
+        """
+        cur.execute(check_token)
+        token_data = cur.fetchone()
+        
+        if not token_data:
+            cur.close()
+            conn.close()
+            return {'error': 'Неверный или просроченный токен'}
+        
+        user_id = token_data['user_id']
+        new_password_hash = hash_password(new_password)
+        
+        # Обновляем пароль
+        update_password = f"""
+            UPDATE {SCHEMA}.users 
+            SET password_hash = {escape_string(new_password_hash)} 
+            WHERE id = {escape_string(user_id)}
+        """
+        cur.execute(update_password)
+        
+        # Помечаем токен как использованный
+        mark_used = f"""
+            UPDATE {SCHEMA}.password_reset_tokens 
+            SET used_at = CURRENT_TIMESTAMP 
+            WHERE token = {escape_string(reset_token)}
+        """
+        cur.execute(mark_used)
+        
+        # Удаляем все сессии пользователя (принудительный выход)
+        delete_sessions = f"""
+            UPDATE {SCHEMA}.sessions 
+            SET expires_at = CURRENT_TIMESTAMP 
+            WHERE user_id = {escape_string(user_id)}
+        """
+        cur.execute(delete_sessions)
+        
+        cur.close()
+        conn.close()
+        
+        return {'success': True, 'message': 'Пароль успешно изменён'}
+    except Exception as e:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+        return {'error': f'Ошибка: {str(e)}'}
+
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method = event.get('httpMethod', 'GET')
     
@@ -349,6 +510,60 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 if 'error' in result:
                     return {
                         'statusCode': 401,
+                        'headers': headers,
+                        'body': json.dumps(result),
+                        'isBase64Encoded': False
+                    }
+                return {
+                    'statusCode': 200,
+                    'headers': headers,
+                    'body': json.dumps(result),
+                    'isBase64Encoded': False
+                }
+            
+            elif path == 'forgot_password':
+                result = forgot_password(body.get('phone', ''))
+                if 'error' in result:
+                    return {
+                        'statusCode': 400,
+                        'headers': headers,
+                        'body': json.dumps(result),
+                        'isBase64Encoded': False
+                    }
+                return {
+                    'statusCode': 200,
+                    'headers': headers,
+                    'body': json.dumps(result),
+                    'isBase64Encoded': False
+                }
+            
+            elif path == 'verify_reset_code':
+                result = verify_reset_code(
+                    body.get('phone', ''),
+                    body.get('code', '')
+                )
+                if 'error' in result:
+                    return {
+                        'statusCode': 400,
+                        'headers': headers,
+                        'body': json.dumps(result),
+                        'isBase64Encoded': False
+                    }
+                return {
+                    'statusCode': 200,
+                    'headers': headers,
+                    'body': json.dumps(result),
+                    'isBase64Encoded': False
+                }
+            
+            elif path == 'reset_password':
+                result = reset_password(
+                    body.get('reset_token', ''),
+                    body.get('new_password', '')
+                )
+                if 'error' in result:
+                    return {
+                        'statusCode': 400,
                         'headers': headers,
                         'body': json.dumps(result),
                         'isBase64Encoded': False

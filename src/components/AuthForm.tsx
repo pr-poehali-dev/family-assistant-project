@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
+import ForgotPassword from './ForgotPassword';
 
 interface AuthFormProps {
   onAuthSuccess: (token: string, user: any) => void;
@@ -13,6 +14,7 @@ interface AuthFormProps {
 export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   
   const [registerData, setRegisterData] = useState({
     phone: '',
@@ -123,6 +125,15 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
     }
   };
 
+  if (showForgotPassword) {
+    return (
+      <ForgotPassword
+        onBack={() => setShowForgotPassword(false)}
+        onSuccess={() => setShowForgotPassword(false)}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
       <Card className="w-full max-w-md border-2 border-blue-200">
@@ -189,6 +200,16 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
                       Войти
                     </>
                   )}
+                </Button>
+                
+                <Button
+                  type="button"
+                  variant="link"
+                  className="w-full text-purple-600 hover:text-purple-700"
+                  onClick={() => setShowForgotPassword(true)}
+                >
+                  <Icon name="KeyRound" className="mr-2" size={16} />
+                  Забыли пароль?
                 </Button>
               </form>
             </TabsContent>
