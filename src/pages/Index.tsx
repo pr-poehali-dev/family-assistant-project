@@ -46,6 +46,7 @@ import {
 } from '@/data/mockData';
 import { FamilyTabsContent } from '@/components/FamilyTabsContent';
 import { FamilyMembersGrid } from '@/components/FamilyMembersGrid';
+import { getTranslation, type LanguageCode } from '@/translations';
 import SettingsMenu from '@/components/SettingsMenu';
 
 interface IndexProps {
@@ -81,6 +82,12 @@ export default function Index({ onLogout }: IndexProps) {
   const [newMessage, setNewMessage] = useState('');
   const [calendarEvents] = useState<CalendarEvent[]>(initialCalendarEvents);
   const [calendarFilter, setCalendarFilter] = useState<'all' | 'personal' | 'family'>('all');
+  const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>(() => {
+    return (localStorage.getItem('familyOrganizerLanguage') as LanguageCode) || 'ru';
+  });
+  
+  const t = (key: keyof typeof import('@/translations').translations.ru) => getTranslation(currentLanguage, key);
+  const [showLanguageSelector, setShowLanguageSelector] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<ThemeType>(() => {
     const saved = localStorage.getItem('familyOrganizerTheme');
     return (saved as ThemeType) || 'middle';
@@ -143,6 +150,21 @@ export default function Index({ onLogout }: IndexProps) {
       clearTimeout(hideTimer);
     };
   }, [showWelcome]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.language-selector') && !target.closest('.theme-selector')) {
+        setShowLanguageSelector(false);
+        setShowThemeSelector(false);
+      }
+    };
+
+    if (showLanguageSelector || showThemeSelector) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showLanguageSelector, showThemeSelector]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -262,6 +284,42 @@ export default function Index({ onLogout }: IndexProps) {
         icon: '🥗'
       }
     ];
+  };
+
+  const handleLanguageChange = (language: string) => {
+    setCurrentLanguage(language);
+    localStorage.setItem('familyOrganizerLanguage', language);
+    setShowLanguageSelector(false);
+    
+    const languageNames: Record<string, string> = {
+      ru: 'Русский',
+      en: 'English',
+      es: 'Español',
+      de: 'Deutsch',
+      fr: 'Français',
+      zh: '中文',
+      ar: 'العربية'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-white border-2 border-blue-500 rounded-lg shadow-2xl p-4 z-[100] animate-fade-in';
+    notification.innerHTML = `
+      <div class="flex items-center gap-3">
+        <div class="text-2xl">🌐</div>
+        <div>
+          <p class="font-bold text-sm">Язык изменен</p>
+          <p class="text-xs text-gray-600">Язык: ${languageNames[language]}</p>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      notification.style.transform = 'translateX(100px)';
+      notification.style.transition = 'all 0.3s ease-out';
+      setTimeout(() => notification.remove(), 300);
+    }, 2000);
   };
 
   const handleThemeChange = (theme: ThemeType) => {
@@ -468,22 +526,77 @@ export default function Index({ onLogout }: IndexProps) {
               <SettingsMenu />
             </div>
             
-            <div className="lg:absolute lg:top-0 lg:right-4">
+            <div className="lg:absolute lg:top-0 lg:right-4 flex flex-col gap-2 language-selector theme-selector">
               <Button
-                onClick={() => setShowThemeSelector(!showThemeSelector)}
-                className="bg-gradient-to-r from-indigo-500 to-purple-600"
-                size="sm"
+                onClick={() => {
+                  setShowLanguageSelector(!showLanguageSelector);
+                  setShowThemeSelector(false);
+                }}
+                className="bg-gradient-to-r from-blue-500 to-cyan-600 h-8 text-xs"
               >
-                <Icon name="Palette" className="mr-2" size={16} />
-                Стиль: {themes[currentTheme].name}
+                <Icon name="Languages" className="mr-2" size={14} />
+                {t('language')}: {currentLanguage === 'ru' ? 'Русский' : currentLanguage === 'en' ? 'English' : currentLanguage === 'es' ? 'Español' : currentLanguage === 'de' ? 'Deutsch' : currentLanguage === 'fr' ? 'Français' : currentLanguage === 'zh' ? '中文' : 'العربية'}
               </Button>
               
+              <Button
+                onClick={() => {
+                  setShowThemeSelector(!showThemeSelector);
+                  setShowLanguageSelector(false);
+                }}
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 h-8 text-xs"
+              >
+                <Icon name="Palette" className="mr-2" size={14} />
+                {t('style')}: {themes[currentTheme].name}
+              </Button>
+              
+              {showLanguageSelector && (
+                <Card className="language-selector absolute right-0 top-12 z-50 w-80 max-w-[calc(100vw-2rem)] border-2 border-blue-300 shadow-2xl animate-fade-in">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Icon name="Languages" size={20} />
+                      {t('selectLanguage')}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {[
+                      { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+                      { code: 'en', name: 'English', flag: '🇬🇧' },
+                      { code: 'es', name: 'Español', flag: '🇪🇸' },
+                      { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+                      { code: 'fr', name: 'Français', flag: '🇫🇷' },
+                      { code: 'zh', name: '中文', flag: '🇨🇳' },
+                      { code: 'ar', name: 'العربية', flag: '🇸🇦' }
+                    ].map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => handleLanguageChange(lang.code)}
+                        className={`w-full text-left p-3 rounded-lg border-2 transition-all hover:shadow-lg ${
+                          currentLanguage === lang.code 
+                            ? 'border-blue-500 bg-blue-50' 
+                            : 'border-gray-200 hover:border-blue-300'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl">{lang.flag}</span>
+                            <span className="font-medium">{lang.name}</span>
+                          </div>
+                          {currentLanguage === lang.code && (
+                            <Icon name="Check" className="text-blue-600" size={20} />
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+              
               {showThemeSelector && (
-                <Card className="absolute right-0 top-12 z-50 w-80 max-w-[calc(100vw-2rem)] border-2 border-indigo-300 shadow-2xl animate-fade-in">
+                <Card className="theme-selector absolute right-0 top-24 z-50 w-80 max-w-[calc(100vw-2rem)] border-2 border-indigo-300 shadow-2xl animate-fade-in">
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                       <Icon name="Palette" size={20} />
-                      Выберите стиль оформления
+                      {t('selectStyle')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
