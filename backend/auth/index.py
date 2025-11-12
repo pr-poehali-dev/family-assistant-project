@@ -214,22 +214,15 @@ def login_user(login: str, password: str) -> Dict[str, Any]:
         return {'error': f'Ошибка входа: {str(e)}'}
 
 def verify_token(token: str) -> Optional[Dict[str, Any]]:
-    print(f"[VERIFY] Starting verification, token received: {token[:10] if token else 'NONE'}...")
-    
     if not token:
-        print("[VERIFY] ERROR: No token provided")
         return None
     
     conn = None
     cur = None
     
     try:
-        print("[VERIFY] Step 1: Getting DB connection...")
         conn = get_db_connection()
-        print("[VERIFY] Step 2: DB connection successful")
-        
         cur = conn.cursor(cursor_factory=RealDictCursor)
-        print("[VERIFY] Step 3: Cursor created")
         
         select_session = f"""
             SELECT s.user_id, s.expires_at, u.email, u.phone,
@@ -241,20 +234,12 @@ def verify_token(token: str) -> Optional[Dict[str, Any]]:
             WHERE s.token = {escape_string(token)} AND s.expires_at > CURRENT_TIMESTAMP
             LIMIT 1
         """
-        print(f"[VERIFY] Step 4: Executing query...")
-        print(f"[VERIFY] Query: {select_session}")
         
         cur.execute(select_session)
-        print("[VERIFY] Step 5: Query executed successfully")
-        
         session = cur.fetchone()
-        print(f"[VERIFY] Step 6: Fetch result - Session found: {bool(session)}")
         
         if not session:
-            print("[VERIFY] ERROR: No valid session found for token")
             return None
-        
-        print(f"[VERIFY] Step 7: Building user data from session: user_id={session.get('user_id')}")
         
         user_data = {
             'id': str(session['user_id']),
@@ -263,26 +248,17 @@ def verify_token(token: str) -> Optional[Dict[str, Any]]:
         }
         
         if session.get('family_id'):
-            print(f"[VERIFY] Step 8: Adding family data: family_id={session['family_id']}")
             user_data['family_id'] = str(session['family_id'])
             user_data['family_name'] = session['family_name']
             user_data['member_id'] = str(session['member_id'])
-        else:
-            print("[VERIFY] Step 8: No family_id in session")
         
-        print(f"[VERIFY] SUCCESS: Verification complete. User: {user_data.get('id')}")
         return user_data
     except Exception as e:
-        print(f"[VERIFY] EXCEPTION: {type(e).__name__}: {str(e)}")
-        import traceback
-        print(f"[VERIFY] TRACEBACK: {traceback.format_exc()}")
         return None
     finally:
         if cur:
-            print("[VERIFY] Closing cursor")
             cur.close()
         if conn:
-            print("[VERIFY] Closing connection")
             conn.close()
 
 def logout_user(token: str) -> Dict[str, Any]:
@@ -307,14 +283,7 @@ def logout_user(token: str) -> Dict[str, Any]:
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method = event.get('httpMethod', 'GET')
     
-    print(f"[HANDLER] === NEW REQUEST ===")
-    print(f"[HANDLER] Method: {method}")
-    print(f"[HANDLER] Headers: {json.dumps(event.get('headers', {}), ensure_ascii=False)}")
-    print(f"[HANDLER] Query params: {event.get('queryStringParameters', {})}")
-    print(f"[HANDLER] Body: {event.get('body', 'NO BODY')[:200]}")
-    
     if method == 'OPTIONS':
-        print("[HANDLER] Handling OPTIONS request")
         return {
             'statusCode': 200,
             'headers': {
@@ -335,8 +304,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     try:
         body = json.loads(event.get('body', '{}'))
         path = event.get('queryStringParameters', {}).get('action', 'login')
-        
-        print(f"[HANDLER] Action path: {path}")
         
         if method == 'POST':
             if path == 'register':
@@ -390,15 +357,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         elif method == 'GET':
             if path == 'verify':
-                print("[HANDLER] Processing VERIFY request")
                 all_headers = event.get('headers', {})
-                print(f"[HANDLER] All headers keys: {list(all_headers.keys())}")
-                
                 token = all_headers.get('X-Auth-Token', '') or all_headers.get('x-auth-token', '')
-                print(f"[HANDLER] Token extracted: {token[:10] if token else 'NONE'}...")
                 
                 if not token:
-                    print("[HANDLER] ERROR: No token in headers")
                     return {
                         'statusCode': 401,
                         'headers': headers,
@@ -406,12 +368,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'isBase64Encoded': False
                     }
                 
-                print("[HANDLER] Calling verify_token...")
                 user = verify_token(token)
-                print(f"[HANDLER] verify_token result: {bool(user)}")
                 
                 if not user:
-                    print("[HANDLER] Returning 401 - invalid token")
                     return {
                         'statusCode': 401,
                         'headers': headers,
@@ -419,7 +378,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'isBase64Encoded': False
                     }
                 
-                print(f"[HANDLER] Returning 200 - success with user: {user.get('id')}")
                 return {
                     'statusCode': 200,
                     'headers': headers,
@@ -435,13 +393,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     except Exception as e:
-        print(f"[HANDLER] ===== EXCEPTION CAUGHT =====")
-        print(f"[HANDLER] Exception type: {type(e).__name__}")
-        print(f"[HANDLER] Exception message: {str(e)}")
-        import traceback
-        print(f"[HANDLER] Full traceback:")
-        traceback.print_exc()
-        print(f"[HANDLER] ===========================")
         return {
             'statusCode': 500,
             'headers': headers,
