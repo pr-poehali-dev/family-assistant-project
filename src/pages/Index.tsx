@@ -11,6 +11,7 @@ import Icon from '@/components/ui/icon';
 import { useNavigate } from 'react-router-dom';
 import { useTasks } from '@/hooks/useTasks';
 import { useFamilyMembers } from '@/hooks/useFamilyMembers';
+import { useFamilyData } from '@/hooks/useFamilyData';
 import { ChildEducation } from '@/components/ChildEducation';
 import type {
   FamilyMember,
@@ -61,6 +62,7 @@ export default function Index({ onLogout }: IndexProps) {
   const navigate = useNavigate();
   const { members: familyMembersRaw, loading: membersLoading, addMember, updateMember, deleteMember } = useFamilyMembers();
   const { tasks: tasksRaw, loading: tasksLoading, toggleTask: toggleTaskDB, createTask, updateTask, deleteTask } = useTasks();
+  const { data: familyData, syncing, syncData, getLastSyncTime } = useFamilyData();
   
   const familyMembers = familyMembersRaw || [];
   const tasks = tasksRaw || [];
@@ -1031,8 +1033,19 @@ export default function Index({ onLogout }: IndexProps) {
             <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-orange-600 via-pink-600 to-purple-600 bg-clip-text text-transparent mb-2">
               Семейный Органайзер
             </h1>
-            <p className="text-sm lg:text-base text-gray-700 font-medium">
+            <p className="text-sm lg:text-base text-gray-700 font-medium flex items-center justify-center gap-2">
               Вместе мы — сила! Организуйте жизнь семьи с любовью ❤️
+              {syncing && (
+                <Badge className="bg-blue-600 animate-pulse">
+                  <Icon name="RefreshCw" className="mr-1 animate-spin" size={12} />
+                  Синхронизация
+                </Badge>
+              )}
+              {!syncing && getLastSyncTime() && (
+                <Badge variant="outline" className="text-xs">
+                  Обновлено: {new Date(getLastSyncTime()!).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                </Badge>
+              )}
             </p>
           </div>
         </div>

@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import type { FamilyMember, TestQuestion, TestResult, LearningMaterial, AIRecommendationForChild } from '@/types/family.types';
+import { useFamilyData } from '@/hooks/useFamilyData';
 
 interface ChildEducationProps {
   child: FamilyMember;
@@ -146,6 +147,7 @@ const learningMaterials: LearningMaterial[] = [
 ];
 
 export function ChildEducation({ child, onComplete }: ChildEducationProps) {
+  const { saveTestResult, syncing } = useFamilyData();
   const [activeTest, setActiveTest] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -156,6 +158,7 @@ export function ChildEducation({ child, onComplete }: ChildEducationProps) {
   });
   const [showResults, setShowResults] = useState(false);
   const [startTime] = useState(Date.now());
+  const [saving, setSaving] = useState(false);
 
   const currentQuestionData = testQuestions[currentQuestion];
 
@@ -183,7 +186,7 @@ export function ChildEducation({ child, onComplete }: ChildEducationProps) {
     }
   };
 
-  const finishTest = (answers: { questionId: string; userAnswer: number; correct: boolean }[]) => {
+  const finishTest = async (answers: { questionId: string; userAnswer: number; correct: boolean }[]) => {
     const categoryScores = {
       logic: 0,
       math: 0,
@@ -238,6 +241,24 @@ export function ChildEducation({ child, onComplete }: ChildEducationProps) {
     const updatedResults = [...testResults, result];
     setTestResults(updatedResults);
     localStorage.setItem(`test_results_${child.id}`, JSON.stringify(updatedResults));
+
+    // Сохраняем на сервер
+    setSaving(true);
+    try {
+      await saveTestResult(child.id, {
+        testType: result.testType,
+        scores: result.scores,
+        totalScore: result.totalScore,
+        maxScore: result.maxScore,
+        timeSpent: result.timeSpent,
+        answers: result.answers
+      });
+    } catch (err) {
+      console.error('Ошибка сохранения на сервер:', err);
+      // Продолжаем работу даже при ошибке - данные сохранены локально
+    } finally {
+      setSaving(false);
+    }
 
     setShowResults(true);
     setActiveTest(false);
@@ -366,10 +387,16 @@ export function ChildEducation({ child, onComplete }: ChildEducationProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mb-3">
             Развивайте способности ребёнка с помощью тестов и обучающих материалов. 
             ИИ-помощник даст персональные рекомендации на основе результатов!
           </p>
+          {(saving || syncing) && (
+            <div className="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 p-2 rounded">
+              <Icon name="Loader" className="animate-spin" size={16} />
+              <span>Синхронизация с сервером...</span>
+            </div>
+          )}
         </CardContent>
       </Card>
 
