@@ -23,7 +23,7 @@ export default function DebugAuth() {
         return;
       }
 
-      const response = await fetch('https://faas.poehali.dev/b1g3nl7ndlbao331jt6m/auth', {
+      const response = await fetch('https://functions.poehali.dev/b9b956c8-e2a6-4c20-aef8-b8422e8cb3b0', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ export default function DebugAuth() {
     setResult(null);
 
     try {
-      const response = await fetch('https://faas.poehali.dev/b1g3nl7ndlbao331jt6m/auth', {
+      const response = await fetch('https://functions.poehali.dev/b9b956c8-e2a6-4c20-aef8-b8422e8cb3b0', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
