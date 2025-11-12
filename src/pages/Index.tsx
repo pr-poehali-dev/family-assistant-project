@@ -106,6 +106,7 @@ export default function Index({ onLogout }: IndexProps) {
   const [autoHideMoodWidget, setAutoHideMoodWidget] = useState(() => {
     return localStorage.getItem('autoHideMoodWidget') === 'true';
   });
+  const [selectedMemberForMood, setSelectedMemberForMood] = useState<string | null>(null);
 
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const currentUser = familyMembers.find(m => m.user_id === user.id || m.id === user.member_id);
@@ -204,6 +205,29 @@ export default function Index({ onLogout }: IndexProps) {
     const newValue = !autoHideMoodWidget;
     setAutoHideMoodWidget(newValue);
     localStorage.setItem('autoHideMoodWidget', String(newValue));
+  };
+
+  const moodOptions = [
+    { emoji: '😊', label: 'Отлично' },
+    { emoji: '😃', label: 'Хорошо' },
+    { emoji: '😐', label: 'Нормально' },
+    { emoji: '😔', label: 'Грустно' },
+    { emoji: '😫', label: 'Устал' },
+    { emoji: '😤', label: 'Раздражён' },
+    { emoji: '🤒', label: 'Болею' },
+    { emoji: '🥳', label: 'Празднично' },
+  ];
+
+  const handleMoodChange = async (memberId: string, mood: { emoji: string; label: string }) => {
+    await updateMember({
+      id: memberId,
+      moodStatus: {
+        emoji: mood.emoji,
+        label: mood.label,
+        timestamp: new Date().toISOString()
+      }
+    });
+    setSelectedMemberForMood(null);
   };
 
   useEffect(() => {
@@ -732,28 +756,55 @@ export default function Index({ onLogout }: IndexProps) {
           </div>
           <div className="p-3 space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto">
             {familyMembers.map((member, index) => (
-              <div
-                key={member.id}
-                className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-all animate-fade-in"
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
-                <div className="flex items-center gap-2">
-                  <div className="text-2xl">{member.avatar}</div>
-                  <div>
-                    <p className="text-xs font-medium">{member.name}</p>
-                    <p className="text-[10px] text-gray-500">{member.role}</p>
+              <div key={member.id} className="relative">
+                <div
+                  className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-all animate-fade-in cursor-pointer"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                  onClick={() => setSelectedMemberForMood(selectedMemberForMood === member.id ? null : member.id)}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="text-2xl">{member.avatar}</div>
+                    <div>
+                      <p className="text-xs font-medium">{member.name}</p>
+                      <p className="text-[10px] text-gray-500">{member.role}</p>
+                    </div>
+                  </div>
+                  <div className="text-center flex items-center gap-1">
+                    {member.moodStatus ? (
+                      <>
+                        <div className="text-xl">{member.moodStatus.emoji}</div>
+                        <div>
+                          <p className="text-[9px] text-gray-500">{member.moodStatus.label}</p>
+                          <p className="text-[8px] text-gray-400">
+                            {new Date(member.moodStatus.timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-xl opacity-30">😐</div>
+                    )}
+                    <Icon name="ChevronDown" size={14} className={`text-gray-400 transition-transform ${selectedMemberForMood === member.id ? 'rotate-180' : ''}`} />
                   </div>
                 </div>
-                <div className="text-center">
-                  {member.moodStatus ? (
-                    <>
-                      <div className="text-xl">{member.moodStatus.emoji}</div>
-                      <p className="text-[9px] text-gray-500">{member.moodStatus.label}</p>
-                    </>
-                  ) : (
-                    <div className="text-xl opacity-30">😐</div>
-                  )}
-                </div>
+                
+                {selectedMemberForMood === member.id && (
+                  <div className="grid grid-cols-4 gap-1 p-2 bg-gray-50 rounded-lg mt-1 animate-fade-in">
+                    {moodOptions.map((mood) => (
+                      <button
+                        key={mood.emoji}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMoodChange(member.id, mood);
+                        }}
+                        className="flex flex-col items-center p-2 rounded hover:bg-white transition-all hover:scale-110"
+                        title={mood.label}
+                      >
+                        <span className="text-2xl">{mood.emoji}</span>
+                        <span className="text-[8px] text-gray-600 mt-1">{mood.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
             {familyMembers.length === 0 && (
@@ -761,6 +812,12 @@ export default function Index({ onLogout }: IndexProps) {
                 Нет данных о членах семьи
               </p>
             )}
+            
+            <div className="mt-2 p-2 bg-blue-50 rounded-lg">
+              <p className="text-[10px] text-blue-600 text-center">
+                💡 Нажмите на члена семьи, чтобы изменить настроение
+              </p>
+            </div>
           </div>
         </div>
         
