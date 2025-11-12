@@ -120,6 +120,13 @@ export function useFamilyData() {
 
   useEffect(() => {
     fetchFamilyData();
+    
+    // Автосинхронизация каждую минуту
+    const syncInterval = setInterval(() => {
+      fetchFamilyData();
+    }, 60000); // 60 секунд
+    
+    return () => clearInterval(syncInterval);
   }, [fetchFamilyData]);
 
   return {

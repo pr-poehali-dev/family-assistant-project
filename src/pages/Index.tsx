@@ -13,6 +13,7 @@ import { useTasks } from '@/hooks/useTasks';
 import { useFamilyMembers } from '@/hooks/useFamilyMembers';
 import { useFamilyData } from '@/hooks/useFamilyData';
 import { ChildEducation } from '@/components/ChildEducation';
+import { ClickChamomile } from '@/components/ClickChamomile';
 import type {
   FamilyMember,
   Task,
@@ -146,6 +147,7 @@ export default function Index({ onLogout }: IndexProps) {
   const [activeSection, setActiveSection] = useState<string>('tasks');
   const [showInDevelopment, setShowInDevelopment] = useState(false);
   const [educationChild, setEducationChild] = useState<FamilyMember | null>(null);
+  const [showClickEffect, setShowClickEffect] = useState(true);
 
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const currentUser = familyMembers.find(m => m.user_id === user.id || m.id === user.member_id);
@@ -1025,15 +1027,15 @@ export default function Index({ onLogout }: IndexProps) {
             backgroundImage: 'url(https://cdn.poehali.dev/projects/bf14db2d-0cf1-4b4d-9257-4d617ffc1cc6/files/99031d20-2ea8-4a39-a89e-1ebe098b6ba4.jpg)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            height: '140px'
+            height: '240px'
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/80 to-white/70 backdrop-blur-[2px]"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/75 to-white/65 backdrop-blur-[1px]"></div>
           <div className="relative h-full flex flex-col items-center justify-center px-6">
-            <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-orange-600 via-pink-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-orange-600 via-pink-600 to-purple-600 bg-clip-text text-transparent mb-3">
               Семейный Органайзер
             </h1>
-            <p className="text-sm lg:text-base text-gray-700 font-medium flex items-center justify-center gap-2">
+            <p className="text-base lg:text-lg text-gray-700 font-medium flex items-center justify-center gap-2 mb-4">
               Вместе мы — сила! Организуйте жизнь семьи с любовью ❤️
               {syncing && (
                 <Badge className="bg-blue-600 animate-pulse">
@@ -1047,15 +1049,24 @@ export default function Index({ onLogout }: IndexProps) {
                 </Badge>
               )}
             </p>
+            <p className="text-xs lg:text-sm text-gray-600 italic">
+              💐 Нажмите в любом месте, чтобы увидеть ромашки
+            </p>
           </div>
         </div>
 
-        <header className="text-center mb-8 relative">
+        <header className="text-center mb-8 relative -mx-4 lg:-mx-8 py-6 rounded-2xl overflow-hidden" style={{
+            backgroundImage: 'url(https://cdn.poehali.dev/projects/bf14db2d-0cf1-4b4d-9257-4d617ffc1cc6/files/99031d20-2ea8-4a39-a89e-1ebe098b6ba4.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}>
+          <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/85 to-white/80 backdrop-blur-[1px]"></div>
+          <div className="relative">
           <h1 className={`${themeClasses.headingFont} text-3xl lg:text-4xl font-bold bg-gradient-to-r ${themeClasses.primaryGradient.replace('bg-gradient-to-r ', '')} bg-clip-text text-transparent mb-3 mt-2 animate-fade-in`}>
             {getSectionTitle(activeSection)}
           </h1>
           
-          <p className="text-lg lg:text-xl text-muted-foreground animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <p className="text-lg lg:text-xl text-gray-700 font-medium animate-fade-in" style={{ animationDelay: '0.2s' }}>
             {activeSection === 'tasks' && 'Управление задачами семьи'}
             {activeSection === 'calendar' && 'Семейные события и планы'}
             {activeSection === 'family' && 'Профили членов семьи'}
@@ -1069,6 +1080,7 @@ export default function Index({ onLogout }: IndexProps) {
             {activeSection === 'rules' && 'Правила и договоренности'}
             {activeSection === 'about' && 'Миссия проекта'}
           </p>
+          </div>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -1986,6 +1998,8 @@ export default function Index({ onLogout }: IndexProps) {
           )}
         </DialogContent>
       </Dialog>
+      
+      {showClickEffect && <ClickChamomile onLoadingComplete={() => {}} />}
     </>
   );
 }
