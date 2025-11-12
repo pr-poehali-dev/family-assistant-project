@@ -133,10 +133,15 @@ def register_user(phone: str, password: str, family_name: Optional[str] = None) 
         return {'error': f'Ошибка регистрации: {str(e)}'}
 
 def login_user(login: str, password: str) -> Dict[str, Any]:
-    conn = get_db_connection()
-    cur = conn.cursor(cursor_factory=RealDictCursor)
+    if not login or not password:
+        return {'error': 'Логин и пароль обязательны'}
+    
+    conn = None
+    cur = None
     
     try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
         is_email = '@' in login
         field = 'email' if is_email else 'phone'
         
@@ -149,14 +154,18 @@ def login_user(login: str, password: str) -> Dict[str, Any]:
         user = cur.fetchone()
         
         if not user:
-            cur.close()
-            conn.close()
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
             return {'error': 'Пользователь не найден'}
         
         password_hash = hash_password(password)
         if user['password_hash'] != password_hash:
-            cur.close()
-            conn.close()
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
             return {'error': 'Неверный пароль'}
         
         select_family = f"""
@@ -189,9 +198,6 @@ def login_user(login: str, password: str) -> Dict[str, Any]:
         """
         cur.execute(update_login)
         
-        cur.close()
-        conn.close()
-        
         user_data = {
             'id': str(user['id']),
             'email': user['email'],
@@ -203,14 +209,21 @@ def login_user(login: str, password: str) -> Dict[str, Any]:
             user_data['family_name'] = family_info['family_name']
             user_data['member_id'] = str(family_info['member_id'])
         
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+        
         return {
             'success': True,
             'token': token,
             'user': user_data
         }
     except Exception as e:
-        cur.close()
-        conn.close()
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
         return {'error': f'Ошибка входа: {str(e)}'}
 
 def verify_token(token: str) -> Optional[Dict[str, Any]]:
