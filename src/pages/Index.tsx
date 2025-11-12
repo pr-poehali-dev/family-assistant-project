@@ -1809,7 +1809,7 @@ export default function Index({ onLogout }: IndexProps) {
                     const dayEvents = calendarEvents.filter(event => event.date === day.fullDate);
                     return (
                       <div
-                        key={index}
+                        key={day.fullDate}
                         className={`p-3 rounded-lg border-2 transition-all hover:shadow-md ${
                           index === 0 
                             ? 'bg-gradient-to-r from-purple-100 to-pink-100 border-purple-300' 
