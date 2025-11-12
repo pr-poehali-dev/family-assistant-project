@@ -407,9 +407,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     except Exception as e:
+        import traceback
+        error_details = {
+            'error': f'Server error: {str(e)}',
+            'type': type(e).__name__,
+            'traceback': traceback.format_exc()
+        }
+        print(f"ERROR in handler: {error_details}")
         return {
             'statusCode': 500,
             'headers': headers,
-            'body': json.dumps({'error': f'Server error: {str(e)}'}),
+            'body': json.dumps({'error': f'Server error: {str(e)}', 'type': type(e).__name__}),
             'isBase64Encoded': False
         }
