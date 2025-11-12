@@ -1835,13 +1835,13 @@ export default function Index({ onLogout }: IndexProps) {
                         </div>
                         {dayEvents.length > 0 && (
                           <div className="space-y-1 mt-2">
-                            {dayEvents.map(event => (
+                            {dayEvents.map((event) => (
                               <div key={event.id} className={`text-xs p-2 rounded ${event.color} border`}>
                                 <div className="flex items-center gap-1">
-                                  <Icon name="Clock" size={12} />
-                                  <span className="font-semibold">{event.time}</span>
+                                  <Icon key={`icon-${event.id}`} name="Clock" size={12} />
+                                  <span key={`time-${event.id}`} className="font-semibold">{event.time}</span>
                                 </div>
-                                <p className="font-medium mt-1">{event.title}</p>
+                                <p key={`title-${event.id}`} className="font-medium mt-1">{event.title}</p>
                               </div>
                             ))}
                           </div>
