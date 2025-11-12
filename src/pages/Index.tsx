@@ -264,10 +264,12 @@ export default function Index({ onLogout }: IndexProps) {
     { id: 'children', icon: 'Baby', label: 'Дети', ready: true },
     { id: 'values', icon: 'Heart', label: 'Ценности', ready: true },
     { id: 'traditions', icon: 'Sparkles', label: 'Традиции', ready: true },
+    { id: 'rules', icon: 'Scale', label: 'Правила', ready: true },
     { id: 'blog', icon: 'BookOpen', label: 'Блог', ready: true },
     { id: 'album', icon: 'Image', label: 'Альбом', ready: true },
     { id: 'tree', icon: 'GitBranch', label: 'Древо', ready: true },
     { id: 'chat', icon: 'MessageCircle', label: 'Чат', ready: true },
+    { id: 'about', icon: 'Info', label: 'О проекте', ready: true },
   ];
   
   const getSectionTitle = (sectionId: string) => {
@@ -1028,6 +1030,8 @@ export default function Index({ onLogout }: IndexProps) {
             {activeSection === 'album' && 'Фотоальбом семьи'}
             {activeSection === 'tree' && 'Генеалогическое древо'}
             {activeSection === 'chat' && 'Семейный чат'}
+            {activeSection === 'rules' && 'Правила и договоренности'}
+            {activeSection === 'about' && 'Миссия проекта'}
           </p>
         </header>
 
@@ -1662,6 +1666,94 @@ export default function Index({ onLogout }: IndexProps) {
                       <Button onClick={handleSendMessage}>
                         <Icon name="Send" size={16} />
                       </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="rules">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Icon name="Scale" />
+                      Правила семьи
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <p className="text-muted-foreground mb-4">
+                        Семейные правила помогают создать атмосферу взаимоуважения и понимания. Здесь вы можете описать договоренности, которые важны для вашей семьи.
+                      </p>
+                      <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-6 text-center">
+                        <Icon name="Scale" size={48} className="mx-auto mb-4 text-purple-500" />
+                        <h3 className="text-lg font-semibold mb-2">Правила пока не добавлены</h3>
+                        <p className="text-sm text-muted-foreground">Создайте список важных для вашей семьи правил и договоренностей</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="about">
+                <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-2xl">
+                      <Icon name="Heart" className="text-red-500" />
+                      О проекте
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="prose prose-lg max-w-none">
+                    <div className="space-y-6">
+                      <div className="text-center py-8 bg-white rounded-lg shadow-sm">
+                        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent mb-4">
+                          Здоровая семья - Здоровая страна!
+                        </h1>
+                        <p className="text-2xl font-semibold text-purple-700 mb-2">
+                          Проект создан для объединения семей!
+                        </p>
+                      </div>
+
+                      <div className="bg-white rounded-lg p-6 shadow-sm space-y-4">
+                        <p className="text-lg leading-relaxed">
+                          Семья - главный проект нашей жизни, от успехов в семье зависит успех нашего общества.
+                        </p>
+
+                        <p className="text-lg leading-relaxed">
+                          Самое важное в семейных ценностях — это возможность сблизить членов семьи, сделать их командой, которая может справиться с любыми невзгодами и каждый в ней имеет значение. Поэтому берегите фамильное наследие вместе, уделяя при этом достаточно внимания ребенку и позволяя ему или ей играть определенную роль, чтобы дать маленькому человеку почувствовать себя частью чего-то большего.
+                        </p>
+
+                        <p className="text-lg leading-relaxed">
+                          Дети полюбят семейные традиции и ценности, если будут счастливы им следовать. И здесь очень важно поговорить о семейных традициях. Это принятые в семье нормы, манеры поведения, взгляды, которые передаются из поколения в поколение.
+                        </p>
+
+                        <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg p-6">
+                          <p className="text-lg leading-relaxed font-semibold mb-3">
+                            Семейные традиции и ритуалы, с одной стороны, — важный признак здоровой и функциональной семьи, а, с другой — один из важнейших механизмов передачи следующим поколениям законов внутрисемейного взаимодействия:
+                          </p>
+                          <ul className="space-y-2 ml-6">
+                            <li className="text-lg flex items-start gap-2">
+                              <Icon name="ArrowRight" size={20} className="text-purple-600 mt-1 flex-shrink-0" />
+                              <span>распределения ролей во всех сферах семейной жизни;</span>
+                            </li>
+                            <li className="text-lg flex items-start gap-2">
+                              <Icon name="ArrowRight" size={20} className="text-purple-600 mt-1 flex-shrink-0" />
+                              <span>правил внутрисемейного общения;</span>
+                            </li>
+                            <li className="text-lg flex items-start gap-2">
+                              <Icon name="ArrowRight" size={20} className="text-purple-600 mt-1 flex-shrink-0" />
+                              <span>способов разрешения конфликтов и преодоления возникающих проблем.</span>
+                            </li>
+                          </ul>
+                        </div>
+
+                        <p className="text-lg leading-relaxed">
+                          Семейные традиции и обряды основываются не только на общественных, религиозных и исторических традициях и обрядах, но творчески дополняются собственными, поэтому они уникальны.
+                        </p>
+
+                        <p className="text-lg leading-relaxed font-semibold text-purple-700">
+                          Традиции помогают укрепить доверие и близость между родными людьми и демонстрируют детям, какой на самом деле может быть семья.
+                        </p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
