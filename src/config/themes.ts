@@ -75,6 +75,25 @@ export const themes: Record<ThemeType, ThemeConfig> = {
     },
     spacing: 'space-y-6',
     borderRadius: 'rounded-2xl'
+  },
+  
+  mono: {
+    name: 'Монохром',
+    description: 'Элегантный стиль с геометрией и серыми тонами',
+    ageRange: 'Премиум',
+    colors: {
+      primary: 'from-gray-900 to-gray-800',
+      secondary: 'from-gray-700 to-gray-600',
+      accent: 'from-gray-500 to-gray-400',
+      background: 'from-gray-50 via-gray-100 to-gray-50',
+      text: 'text-gray-900'
+    },
+    fontSize: {
+      base: 'text-sm',
+      heading: 'text-3xl lg:text-5xl'
+    },
+    spacing: 'space-y-3',
+    borderRadius: 'rounded-none'
   }
 };
 

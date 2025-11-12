@@ -319,7 +319,7 @@ export interface PaymentInfo {
   paymentDate?: string;
 }
 
-export type ThemeType = 'young' | 'middle' | 'senior' | 'apple';
+export type ThemeType = 'young' | 'middle' | 'senior' | 'apple' | 'mono';
 
 export interface ThemeConfig {
   name: string;

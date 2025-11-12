@@ -151,3 +151,54 @@
 .animate-bounce-slow {
   animation: bounce-slow 2s ease-in-out infinite;
 }
+
+.theme-mono .card,
+.theme-mono .button,
+.theme-mono .input,
+.theme-mono .badge,
+.theme-mono .dialog-content {
+  @apply rounded-none shadow-none;
+  border: 1px solid #e5e7eb;
+}
+
+.theme-mono .card {
+  @apply bg-white border-gray-200;
+}
+
+.theme-mono button {
+  @apply rounded-none;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-mono button:hover {
+  @apply bg-gray-100;
+  transform: translateY(-1px);
+}
+
+.theme-mono .badge {
+  @apply rounded-none px-3 py-1;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+.theme-mono * {
+  @apply rounded-none;
+}
+
+.theme-mono h1,
+.theme-mono h2,
+.theme-mono h3,
+.theme-mono h4 {
+  font-weight: 300;
+  letter-spacing: -0.5px;
+}
+
+.theme-mono .tabs-list {
+  @apply bg-transparent border-b border-gray-200;
+}
+
+.theme-mono .tabs-trigger {
+  @apply rounded-none border-b-2 border-transparent data-[state=active]:border-gray-900;
+}
