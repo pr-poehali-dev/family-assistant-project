@@ -6,10 +6,12 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
 import { useNavigate } from 'react-router-dom';
 import { useTasks } from '@/hooks/useTasks';
 import { useFamilyMembers } from '@/hooks/useFamilyMembers';
+import { ChildEducation } from '@/components/ChildEducation';
 import type {
   FamilyMember,
   Task,
@@ -141,6 +143,7 @@ export default function Index({ onLogout }: IndexProps) {
   });
   const [activeSection, setActiveSection] = useState<string>('tasks');
   const [showInDevelopment, setShowInDevelopment] = useState(false);
+  const [educationChild, setEducationChild] = useState<FamilyMember | null>(null);
 
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const currentUser = familyMembers.find(m => m.user_id === user.id || m.id === user.member_id);
@@ -1436,6 +1439,16 @@ export default function Index({ onLogout }: IndexProps) {
                               )}
                             </div>
                           </div>
+                          
+                          <div className="pt-3 border-t">
+                            <Button
+                              onClick={() => setEducationChild(familyMembers.find(m => m.id === child.childId) || null)}
+                              className="w-full bg-gradient-to-r from-purple-600 to-blue-600"
+                            >
+                              <Icon name="GraduationCap" className="mr-2" size={16} />
+                              Обучение и развитие
+                            </Button>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -1946,6 +1959,20 @@ export default function Index({ onLogout }: IndexProps) {
         </div>
       </div>
     </div>
+
+      <Dialog open={educationChild !== null} onOpenChange={(open) => !open && setEducationChild(null)}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Образовательный центр</DialogTitle>
+          </DialogHeader>
+          {educationChild && (
+            <ChildEducation 
+              child={educationChild} 
+              onComplete={() => setEducationChild(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

@@ -122,13 +122,18 @@ export interface MealVoting {
 }
 
 export interface ChildProfile {
+  id?: string;
   childId: string;
   childName: string;
+  name?: string;
   age: number;
+  avatar?: string;
+  grade?: string;
   interests: string[];
   strengths: string[];
   goals: string[];
   personality: string;
+  achievements?: string[];
 }
 
 export interface Activity {
@@ -160,6 +165,63 @@ export interface DevelopmentPlan {
   schedule: Activity[];
   skills: SkillRecommendation[];
   milestones: { title: string; completed: boolean; date: string }[];
+}
+
+export interface TestQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  category: 'logic' | 'math' | 'language' | 'memory' | 'attention' | 'creativity';
+  difficulty: 'easy' | 'medium' | 'hard';
+  ageRange: string;
+  points: number;
+}
+
+export interface TestResult {
+  id: string;
+  childId: string;
+  testType: string;
+  date: string;
+  scores: {
+    logic: number;
+    math: number;
+    language: number;
+    memory: number;
+    attention: number;
+    creativity: number;
+  };
+  totalScore: number;
+  maxScore: number;
+  timeSpent: number;
+  answers: { questionId: string; userAnswer: number; correct: boolean }[];
+}
+
+export interface LearningMaterial {
+  id: string;
+  title: string;
+  description: string;
+  category: 'logic' | 'math' | 'language' | 'memory' | 'attention' | 'creativity';
+  ageRange: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  type: 'video' | 'article' | 'exercise' | 'game';
+  url?: string;
+  content?: string;
+  duration?: string;
+  icon: string;
+}
+
+export interface AIRecommendationForChild {
+  id: string;
+  childId: string;
+  category: string;
+  weakArea: string;
+  currentLevel: number;
+  targetLevel: number;
+  recommendations: string[];
+  suggestedMaterials: string[];
+  estimatedTimeToImprove: string;
+  createdAt: string;
 }
 
 export interface ChatMessage {
