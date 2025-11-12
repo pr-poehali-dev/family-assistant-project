@@ -57,14 +57,21 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
         body: JSON.stringify(requestBody)
       });
       
-      const data = await response.json();
+      const responseText = await response.text();
       
-      if (data.error) {
-        setError(data.error);
-      } else {
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        onAuthSuccess(data.token, data.user);
+      try {
+        const data = JSON.parse(responseText);
+        
+        if (data.error) {
+          setError(data.error);
+        } else {
+          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          onAuthSuccess(data.token, data.user);
+        }
+      } catch (parseErr) {
+        setError(`Ошибка сервера (${response.status}): Сервер вернул не JSON. Возможно проблема с базой данных.`);
+        console.error('Server response:', responseText.substring(0, 500));
       }
     } catch (err) {
       setError('Ошибка при регистрации: ' + (err instanceof Error ? err.message : String(err)));
@@ -93,14 +100,21 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
         body: JSON.stringify({ login: loginData.phone, password: loginData.password })
       });
       
-      const data = await response.json();
+      const responseText = await response.text();
       
-      if (data.error) {
-        setError(data.error);
-      } else {
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        onAuthSuccess(data.token, data.user);
+      try {
+        const data = JSON.parse(responseText);
+        
+        if (data.error) {
+          setError(data.error);
+        } else {
+          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          onAuthSuccess(data.token, data.user);
+        }
+      } catch (parseErr) {
+        setError(`Ошибка сервера (${response.status}): Сервер вернул не JSON. Возможно проблема с базой данных.`);
+        console.error('Server response:', responseText.substring(0, 500));
       }
     } catch (err) {
       setError('Ошибка при входе: ' + (err instanceof Error ? err.message : String(err)));
