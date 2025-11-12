@@ -716,8 +716,10 @@ export default function Index({ onLogout }: IndexProps) {
                 <Card className="language-selector absolute right-0 top-full mt-2 z-50 w-80 max-w-[calc(100vw-2rem)] border-2 border-blue-300 shadow-2xl animate-fade-in">
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
-                      <Icon name="Languages" size={20} />
-                      {t('selectLanguage')}
+                      <>
+                        <Icon key="icon-lang" name="Languages" size={20} />
+                        <span key="text-lang">{t('selectLanguage')}</span>
+                      </>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
@@ -758,8 +760,10 @@ export default function Index({ onLogout }: IndexProps) {
                 <Card className="theme-selector absolute right-0 top-full mt-2 z-50 w-80 max-w-[calc(100vw-2rem)] border-2 border-indigo-300 shadow-2xl animate-fade-in">
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
-                      <Icon name="Palette" size={20} />
-                      {t('selectStyle')}
+                      <>
+                        <Icon key="icon-theme" name="Palette" size={20} />
+                        <span key="text-theme">{t('selectStyle')}</span>
+                      </>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -1244,8 +1248,10 @@ export default function Index({ onLogout }: IndexProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Icon name="CheckSquare" />
-                      Задачи семьи
+                      <>
+                        <Icon key="icon-tasks" name="CheckSquare" />
+                        <span key="text-tasks">Задачи семьи</span>
+                      </>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -1279,8 +1285,10 @@ export default function Index({ onLogout }: IndexProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Icon name="Users" />
-                      Профили членов семьи
+                      <>
+                        <Icon key="icon-family" name="Users" />
+                        <span key="text-family">Профили членов семьи</span>
+                      </>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -1297,8 +1305,10 @@ export default function Index({ onLogout }: IndexProps) {
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="flex items-center gap-2">
-                        <Icon name="Calendar" />
-                        Календарь событий
+                        <>
+                          <Icon key="icon-calendar" name="Calendar" />
+                          <span key="text-calendar">Календарь событий</span>
+                        </>
                       </CardTitle>
                       <Tabs value={calendarFilter} onValueChange={(v) => setCalendarFilter(v as any)}>
                         <TabsList>
@@ -1361,14 +1371,16 @@ export default function Index({ onLogout }: IndexProps) {
                     <Card key={child.id} className="animate-fade-in" style={{ animationDelay: `${idx * 0.1}s` }}>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-3">
-                          <span className="text-4xl">{child.avatar}</span>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span>{child.name}</span>
-                              <Badge>{child.age} лет</Badge>
+                          <>
+                            <span key={`avatar-${child.id}`} className="text-4xl">{child.avatar}</span>
+                            <div key={`info-${child.id}`}>
+                              <div className="flex items-center gap-2">
+                                <span>{child.name}</span>
+                                <Badge>{child.age} лет</Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground font-normal">Класс: {child.grade}</p>
                             </div>
-                            <p className="text-sm text-muted-foreground font-normal">Класс: {child.grade}</p>
-                          </div>
+                          </>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
@@ -1427,8 +1439,10 @@ export default function Index({ onLogout }: IndexProps) {
                     <Card key={value.id} className="animate-fade-in" style={{ animationDelay: `${idx * 0.1}s` }}>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                          <span className="text-2xl">{value.icon}</span>
-                          {value.title}
+                          <>
+                            <span key={`icon-${value.id}`} className="text-2xl">{value.icon}</span>
+                            <span key={`title-${value.id}`}>{value.title}</span>
+                          </>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
@@ -1466,15 +1480,17 @@ export default function Index({ onLogout }: IndexProps) {
                     <Card key={tradition.id} className="animate-fade-in" style={{ animationDelay: `${idx * 0.1}s` }}>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-3">
-                          <span className="text-3xl">{tradition.icon}</span>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <span>{tradition.name}</span>
-                              <Badge className={tradition.frequency === 'weekly' ? 'bg-blue-500' : tradition.frequency === 'monthly' ? 'bg-purple-500' : 'bg-pink-500'}>
-                                {tradition.frequency === 'weekly' ? 'Еженедельно' : tradition.frequency === 'monthly' ? 'Ежемесячно' : 'Ежегодно'}
-                              </Badge>
+                          <>
+                            <span key={`icon-${tradition.id}`} className="text-3xl">{tradition.icon}</span>
+                            <div key={`info-${tradition.id}`} className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <span>{tradition.name}</span>
+                                <Badge className={tradition.frequency === 'weekly' ? 'bg-blue-500' : tradition.frequency === 'monthly' ? 'bg-purple-500' : 'bg-pink-500'}>
+                                  {tradition.frequency === 'weekly' ? 'Еженедельно' : tradition.frequency === 'monthly' ? 'Ежемесячно' : 'Ежегодно'}
+                                </Badge>
+                              </div>
                             </div>
-                          </div>
+                          </>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
@@ -1578,8 +1594,10 @@ export default function Index({ onLogout }: IndexProps) {
                 <Card key="tree-card">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Icon name="GitBranch" />
-                      Генеалогическое древо
+                      <>
+                        <Icon key="icon-tree" name="GitBranch" />
+                        <span key="text-tree">Генеалогическое древо</span>
+                      </>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -1617,8 +1635,10 @@ export default function Index({ onLogout }: IndexProps) {
                 <Card key="chat-card">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Icon name="MessageCircle" />
-                      Семейный чат
+                      <>
+                        <Icon key="icon-chat" name="MessageCircle" />
+                        <span key="text-chat">Семейный чат</span>
+                      </>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -1675,8 +1695,10 @@ export default function Index({ onLogout }: IndexProps) {
                 <Card key="rules-card">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Icon name="Scale" />
-                      Правила семьи
+                      <>
+                        <Icon key="icon-rules" name="Scale" />
+                        <span key="text-rules">Правила семьи</span>
+                      </>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -1698,8 +1720,10 @@ export default function Index({ onLogout }: IndexProps) {
                 <Card key="about-card" className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-2xl">
-                      <Icon name="Heart" className="text-red-500" />
-                      О проекте
+                      <>
+                        <Icon key="icon-about" name="Heart" className="text-red-500" />
+                        <span key="text-about">О проекте</span>
+                      </>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-lg max-w-none">
@@ -1799,8 +1823,10 @@ export default function Index({ onLogout }: IndexProps) {
             <Card key="sidebar-weekly-calendar" className="animate-fade-in border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50" style={{ animationDelay: '0.5s' }}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Icon name="Calendar" size={24} />
-                  Календарь на неделю
+                  <>
+                    <Icon key="icon-week-calendar" name="Calendar" size={24} />
+                    <span key="text-week-calendar">Календарь на неделю</span>
+                  </>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1856,8 +1882,10 @@ export default function Index({ onLogout }: IndexProps) {
             <Card key="sidebar-reminders" className="animate-fade-in border-orange-200 bg-gradient-to-br from-orange-50 to-yellow-50" style={{ animationDelay: '0.6s' }}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Icon name="Bell" size={24} />
-                  Напоминания
+                  <>
+                    <Icon key="icon-reminders" name="Bell" size={24} />
+                    <span key="text-reminders">Напоминания</span>
+                  </>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1884,8 +1912,10 @@ export default function Index({ onLogout }: IndexProps) {
             <Card key="sidebar-ai-tips" className="animate-fade-in border-green-200 bg-gradient-to-br from-green-50 to-emerald-50" style={{ animationDelay: '0.7s' }}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Icon name="Sparkles" size={24} />
-                  AI Советы
+                  <>
+                    <Icon key="icon-ai-tips" name="Sparkles" size={24} />
+                    <span key="text-ai-tips">AI Советы</span>
+                  </>
                 </CardTitle>
               </CardHeader>
               <CardContent>
