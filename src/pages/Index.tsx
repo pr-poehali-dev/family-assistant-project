@@ -1375,7 +1375,7 @@ export default function Index({ onLogout }: IndexProps) {
                               Интересы
                             </h4>
                             <div className="flex flex-wrap gap-2">
-                              {child.interests.map((interest, i) => (
+                              {child.interests?.map((interest, i) => (
                                 <Badge key={i} variant="outline">{interest}</Badge>
                               ))}
                             </div>
@@ -1386,7 +1386,7 @@ export default function Index({ onLogout }: IndexProps) {
                               Достижения
                             </h4>
                             <div className="space-y-1">
-                              {child.achievements.slice(0, 3).map((achievement, i) => (
+                              {child.achievements?.slice(0, 3).map((achievement, i) => (
                                 <div key={i} className="text-sm text-muted-foreground flex items-center gap-2">
                                   <Icon name="CheckCircle" size={12} className="text-green-500" />
                                   {achievement}
@@ -1415,7 +1415,7 @@ export default function Index({ onLogout }: IndexProps) {
                         <p className="text-muted-foreground mb-3">{value.description}</p>
                         <div className="space-y-2">
                           <h4 className="font-semibold text-sm">Как мы это практикуем:</h4>
-                          {value.practices.map((practice, i) => (
+                          {value.practices?.map((practice, i) => (
                             <div key={i} className="flex items-start gap-2 text-sm">
                               <Icon name="ArrowRight" size={14} className="text-purple-500 mt-0.5" />
                               <span>{practice}</span>
@@ -1508,7 +1508,7 @@ export default function Index({ onLogout }: IndexProps) {
                         <p className="text-sm font-semibold mb-1">{photo.title}</p>
                         <p className="text-xs text-muted-foreground">{photo.date}</p>
                         <div className="flex flex-wrap gap-1 mt-2">
-                          {photo.tags.slice(0, 3).map((tag, i) => (
+                          {photo.tags?.slice(0, 3).map((tag, i) => (
                             <Badge key={i} variant="outline" className="text-xs">{tag}</Badge>
                           ))}
                         </div>
