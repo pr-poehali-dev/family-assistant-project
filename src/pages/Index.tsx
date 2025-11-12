@@ -1361,16 +1361,14 @@ export default function Index({ onLogout }: IndexProps) {
                     <Card key={child.id} className="animate-fade-in" style={{ animationDelay: `${idx * 0.1}s` }}>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-3">
-                          <>
-                            <span key={`avatar-${child.id}`} className="text-4xl">{child.avatar}</span>
-                            <div key={`info-${child.id}`}>
-                              <div className="flex items-center gap-2">
-                                <span>{child.name}</span>
-                                <Badge>{child.age} лет</Badge>
-                              </div>
-                              <p className="text-sm text-muted-foreground font-normal">Класс: {child.grade}</p>
+                          <span className="text-4xl">{child.avatar}</span>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span>{child.name}</span>
+                              <Badge>{child.age} лет</Badge>
                             </div>
-                          </>
+                            <p className="text-sm text-muted-foreground font-normal">Класс: {child.grade}</p>
+                          </div>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
@@ -1383,7 +1381,7 @@ export default function Index({ onLogout }: IndexProps) {
                             <div className="flex flex-wrap gap-2">
                               {child.interests && child.interests.length > 0 ? (
                                 child.interests.map((interest, i) => (
-                                  <Badge key={i} variant="outline">{interest}</Badge>
+                                  <Badge key={`${child.id}-interest-${i}`} variant="outline">{interest}</Badge>
                                 ))
                               ) : (
                                 <p className="text-sm text-muted-foreground">Интересы пока не добавлены</p>
@@ -1398,7 +1396,7 @@ export default function Index({ onLogout }: IndexProps) {
                             <div className="space-y-1">
                               {child.achievements && child.achievements.length > 0 ? (
                                 child.achievements.slice(0, 3).map((achievement, i) => (
-                                  <div key={i} className="text-sm text-muted-foreground flex items-center gap-2">
+                                  <div key={`${child.id}-achievement-${i}`} className="text-sm text-muted-foreground flex items-center gap-2">
                                     <Icon name="CheckCircle" size={12} className="text-green-500" />
                                     {achievement}
                                   </div>
@@ -1429,10 +1427,8 @@ export default function Index({ onLogout }: IndexProps) {
                     <Card key={value.id} className="animate-fade-in" style={{ animationDelay: `${idx * 0.1}s` }}>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                          <>
-                            <span key={`icon-${value.id}`} className="text-2xl">{value.icon}</span>
-                            <span key={`title-${value.id}`}>{value.title}</span>
-                          </>
+                          <span className="text-2xl">{value.icon}</span>
+                          {value.title}
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
@@ -1441,7 +1437,7 @@ export default function Index({ onLogout }: IndexProps) {
                           <h4 className="font-semibold text-sm">Как мы это практикуем:</h4>
                           {value.practices && value.practices.length > 0 ? (
                             value.practices.map((practice, i) => (
-                              <div key={i} className="flex items-start gap-2 text-sm">
+                              <div key={`${value.id}-practice-${i}`} className="flex items-start gap-2 text-sm">
                                 <Icon name="ArrowRight" size={14} className="text-purple-500 mt-0.5" />
                               <span>{practice}</span>
                               </div>
@@ -1470,17 +1466,15 @@ export default function Index({ onLogout }: IndexProps) {
                     <Card key={tradition.id} className="animate-fade-in" style={{ animationDelay: `${idx * 0.1}s` }}>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-3">
-                          <>
-                            <span key={`icon-${tradition.id}`} className="text-3xl">{tradition.icon}</span>
-                            <div key={`info-${tradition.id}`} className="flex-1">
-                              <div className="flex items-center justify-between">
-                                <span>{tradition.name}</span>
-                                <Badge className={tradition.frequency === 'weekly' ? 'bg-blue-500' : tradition.frequency === 'monthly' ? 'bg-purple-500' : 'bg-pink-500'}>
-                                  {tradition.frequency === 'weekly' ? 'Еженедельно' : tradition.frequency === 'monthly' ? 'Ежемесячно' : 'Ежегодно'}
-                                </Badge>
-                              </div>
+                          <span className="text-3xl">{tradition.icon}</span>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <span>{tradition.name}</span>
+                              <Badge className={tradition.frequency === 'weekly' ? 'bg-blue-500' : tradition.frequency === 'monthly' ? 'bg-purple-500' : 'bg-pink-500'}>
+                                {tradition.frequency === 'weekly' ? 'Еженедельно' : tradition.frequency === 'monthly' ? 'Ежемесячно' : 'Ежегодно'}
+                              </Badge>
                             </div>
-                          </>
+                          </div>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
