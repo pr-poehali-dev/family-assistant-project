@@ -115,7 +115,7 @@ export default function MemberProfile() {
               <CardTitle className="text-sm text-muted-foreground">Достижения</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-blue-600">{member.achievements.length}</p>
+              <p className="text-3xl font-bold text-blue-600">{(member.achievements || []).length}</p>
             </CardContent>
           </Card>
 
@@ -203,7 +203,7 @@ export default function MemberProfile() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
-                    {member.achievements.map((achievement, index) => (
+                    {(member.achievements || []).map((achievement, index) => (
                       <Badge key={index} className="bg-gradient-to-r from-yellow-400 to-orange-400">
                         <Icon name="Award" className="mr-1" size={14} />
                         {achievement}

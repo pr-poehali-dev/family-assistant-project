@@ -195,7 +195,7 @@ export function MembersTabContent({
                 <Progress value={member.workload} className="h-2" />
                 
                 <div className="flex gap-1 flex-wrap mt-3">
-                  {member.achievements.slice(0, 3).map((achievement, i) => (
+                  {(member.achievements || []).slice(0, 3).map((achievement, i) => (
                     <Badge key={i} variant="secondary" className="text-xs">
                       {achievement === 'early_bird' && '🌅 Ранняя пташка'}
                       {achievement === 'helper' && '🤝 Помощник'}
@@ -270,14 +270,14 @@ export function MembersTabContent({
                           </div>
                         </div>
                         
-                        {member.achievements.length > 0 && (
+                        {(member.achievements || []).length > 0 && (
                           <div>
                             <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
                               <Icon name="Trophy" className="text-yellow-500" size={20} />
                               Достижения
                             </h3>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                              {member.achievements.map((achievement, i) => (
+                              {(member.achievements || []).map((achievement, i) => (
                                 <div key={i} className="flex items-center gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
                                   <span className="text-2xl">
                                     {achievement === 'early_bird' && '🌅'}
