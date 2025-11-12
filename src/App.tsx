@@ -16,6 +16,8 @@ import Pets from "./pages/Pets";
 import NotFound from "./pages/NotFound";
 import AuthForm from "./components/AuthForm";
 import FamilySetup from "./components/FamilySetup";
+import Community from "./pages/Community";
+import MemberProfile from "./pages/MemberProfile";
 
 const queryClient = new QueryClient();
 
@@ -118,6 +120,8 @@ const App = () => {
             <Route path="/education" element={<Education />} />
             <Route path="/travel" element={<Travel />} />
             <Route path="/pets" element={<Pets />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/member/:memberId" element={<MemberProfile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

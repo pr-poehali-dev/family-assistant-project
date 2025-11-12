@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import Icon from '@/components/ui/icon';
 import { useNavigate } from 'react-router-dom';
@@ -45,6 +45,7 @@ import {
   getWeekDays,
 } from '@/data/mockData';
 import { FamilyTabsContent } from '@/components/FamilyTabsContent';
+import { FamilyMembersGrid } from '@/components/FamilyMembersGrid';
 import SettingsMenu from '@/components/SettingsMenu';
 
 interface IndexProps {
@@ -79,6 +80,7 @@ export default function Index({ onLogout }: IndexProps) {
   const [aiRecommendations] = useState<AIRecommendation[]>(initialAIRecommendations);
   const [newMessage, setNewMessage] = useState('');
   const [calendarEvents] = useState<CalendarEvent[]>(initialCalendarEvents);
+  const [calendarFilter, setCalendarFilter] = useState<'all' | 'personal' | 'family'>('all');
   const [currentTheme, setCurrentTheme] = useState<ThemeType>(() => {
     const saved = localStorage.getItem('familyOrganizerTheme');
     return (saved as ThemeType) || 'middle';
@@ -589,6 +591,22 @@ export default function Index({ onLogout }: IndexProps) {
                   <Icon name="Network" className="mr-1" size={14} />
                   Древо
                 </TabsTrigger>
+                <TabsTrigger value="profiles" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
+                  <Icon name="UserCircle" className="mr-1" size={14} />
+                  Профили
+                </TabsTrigger>
+                <TabsTrigger value="calendar" className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap">
+                  <Icon name="Calendar" className="mr-1" size={14} />
+                  Календарь
+                </TabsTrigger>
+                <Button
+                  onClick={() => navigate('/community')}
+                  variant="outline"
+                  className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap border-purple-300 bg-purple-50 hover:bg-purple-100"
+                >
+                  <Icon name="Users" className="mr-1" size={14} />
+                  Сообщество
+                </Button>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -750,6 +768,86 @@ export default function Index({ onLogout }: IndexProps) {
                   Алиса
                 </TabsTrigger>
               </TabsList>
+
+              <TabsContent value="profiles">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Icon name="UserCircle" />
+                      Профили членов семьи
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <FamilyMembersGrid 
+                      members={familyMembers}
+                      onMemberClick={(member) => navigate(`/member/${member.id}`)}
+                    />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="calendar">
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        <Icon name="Calendar" />
+                        Календарь событий
+                      </CardTitle>
+                      <Tabs value={calendarFilter} onValueChange={(v) => setCalendarFilter(v as any)}>
+                        <TabsList>
+                          <TabsTrigger value="all">Все</TabsTrigger>
+                          <TabsTrigger value="personal">Мои</TabsTrigger>
+                          <TabsTrigger value="family">Семейные</TabsTrigger>
+                        </TabsList>
+                      </Tabs>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {calendarEvents
+                        .filter(event => {
+                          if (calendarFilter === 'all') return true;
+                          if (calendarFilter === 'personal') return event.createdBy === currentUserId;
+                          if (calendarFilter === 'family') return event.visibility === 'family';
+                          return true;
+                        })
+                        .map((event, index) => (
+                          <div key={event.id} className={`p-4 rounded-lg ${event.color} animate-fade-in`} style={{ animationDelay: `${index * 0.1}s` }}>
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <h4 className="font-bold text-lg">{event.title}</h4>
+                                <p className="text-sm text-muted-foreground">{event.description}</p>
+                                <div className="flex items-center gap-2 mt-2 text-sm">
+                                  <Badge variant="outline">{event.category}</Badge>
+                                  <span className="flex items-center gap-1">
+                                    <Icon name="Clock" size={14} />
+                                    {event.time}
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    <Icon name="Calendar" size={14} />
+                                    {new Date(event.date).toLocaleDateString('ru-RU')}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="text-3xl">{event.createdByAvatar}</div>
+                            </div>
+                          </div>
+                        ))}
+                      {calendarEvents.filter(event => {
+                        if (calendarFilter === 'all') return true;
+                        if (calendarFilter === 'personal') return event.createdBy === currentUserId;
+                        if (calendarFilter === 'family') return event.visibility === 'family';
+                        return true;
+                      }).length === 0 && (
+                        <p className="text-center text-muted-foreground py-8">
+                          Нет событий в этом фильтре
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
               <FamilyTabsContent
                 familyMembers={familyMembers}
