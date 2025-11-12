@@ -1036,7 +1036,7 @@ export default function Index({ onLogout }: IndexProps) {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="animate-fade-in hover:shadow-lg transition-all border-l-4 border-l-orange-500" style={{ animationDelay: '0.1s' }}>
+          <Card key="stat-points" className="animate-fade-in hover:shadow-lg transition-all border-l-4 border-l-orange-500" style={{ animationDelay: '0.1s' }}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Всего баллов</CardTitle>
               <Icon name="Award" className="text-orange-500" size={20} />
@@ -1046,7 +1046,7 @@ export default function Index({ onLogout }: IndexProps) {
             </CardContent>
           </Card>
 
-          <Card className="animate-fade-in hover:shadow-lg transition-all border-l-4 border-l-pink-500" style={{ animationDelay: '0.2s' }}>
+          <Card key="stat-workload" className="animate-fade-in hover:shadow-lg transition-all border-l-4 border-l-pink-500" style={{ animationDelay: '0.2s' }}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Средняя загрузка</CardTitle>
               <Icon name="TrendingUp" className="text-pink-500" size={20} />
@@ -1056,7 +1056,7 @@ export default function Index({ onLogout }: IndexProps) {
             </CardContent>
           </Card>
 
-          <Card className="animate-fade-in hover:shadow-lg transition-all border-l-4 border-l-purple-500" style={{ animationDelay: '0.3s' }}>
+          <Card key="stat-tasks" className="animate-fade-in hover:shadow-lg transition-all border-l-4 border-l-purple-500" style={{ animationDelay: '0.3s' }}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Задачи выполнены</CardTitle>
               <Icon name="CheckCircle2" className="text-purple-500" size={20} />
@@ -1066,7 +1066,7 @@ export default function Index({ onLogout }: IndexProps) {
             </CardContent>
           </Card>
 
-          <Card className="animate-fade-in hover:shadow-lg transition-all border-l-4 border-l-blue-500" style={{ animationDelay: '0.4s' }}>
+          <Card key="stat-members" className="animate-fade-in hover:shadow-lg transition-all border-l-4 border-l-blue-500" style={{ animationDelay: '0.4s' }}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Членов семьи</CardTitle>
               <Icon name="Users" className="text-blue-500" size={20} />
