@@ -15,6 +15,12 @@ export default function SettingsMenu() {
   const [isExporting, setIsExporting] = useState(false);
   const [subscription, setSubscription] = useState<any>(null);
   const [loadingSubscription, setLoadingSubscription] = useState(false);
+  const [chamomileEnabled, setChamomileEnabled] = useState(() => {
+    return localStorage.getItem('chamomileEnabled') !== 'false';
+  });
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    return localStorage.getItem('soundEnabled') !== 'false';
+  });
 
   const getAuthToken = () => localStorage.getItem('authToken') || '';
 
@@ -114,10 +120,14 @@ export default function SettingsMenu() {
           </DialogHeader>
 
           <Tabs defaultValue="invites" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="invites">
                 <Icon name="Users" className="mr-2" size={16} />
                 Приглашения
+              </TabsTrigger>
+              <TabsTrigger value="effects">
+                <Icon name="Sparkles" className="mr-2" size={16} />
+                Эффекты
               </TabsTrigger>
               <TabsTrigger value="export">
                 <Icon name="Download" className="mr-2" size={16} />
@@ -131,6 +141,132 @@ export default function SettingsMenu() {
 
             <TabsContent value="invites" className="space-y-4 mt-4">
               <FamilyInviteManager />
+            </TabsContent>
+
+            <TabsContent value="effects" className="space-y-4 mt-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="Sparkles" size={24} />
+                    Интерактивные эффекты
+                  </CardTitle>
+                  <CardDescription>
+                    Настройте визуальные эффекты и звуки
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border-2 border-purple-200">
+                    <div className="flex items-start gap-3">
+                      <div className="text-3xl">🌼</div>
+                      <div>
+                        <h3 className="font-semibold text-lg mb-1">Ромашки при клике</h3>
+                        <p className="text-sm text-gray-600 mb-2">
+                          Красивая анимация ромашек при каждом клике по экрану
+                        </p>
+                        <div className="flex gap-2 flex-wrap">
+                          <Badge variant="outline" className="text-xs">🌼 8 цветов</Badge>
+                          <Badge variant="outline" className="text-xs">✨ Искорки</Badge>
+                          <Badge variant="outline" className="text-xs">🎯 Комбо эффект</Badge>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        const newValue = !chamomileEnabled;
+                        setChamomileEnabled(newValue);
+                        localStorage.setItem('chamomileEnabled', String(newValue));
+                        window.dispatchEvent(new CustomEvent('chamomileToggle', { detail: newValue }));
+                      }}
+                      variant={chamomileEnabled ? 'default' : 'outline'}
+                      size="lg"
+                    >
+                      {chamomileEnabled ? '✅ Включено' : '❌ Выключено'}
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border-2 border-blue-200">
+                    <div className="flex items-start gap-3">
+                      <div className="text-3xl">🔊</div>
+                      <div>
+                        <h3 className="font-semibold text-lg mb-1">Звуковые эффекты</h3>
+                        <p className="text-sm text-gray-600 mb-2">
+                          Мелодичные звуки при появлении ромашек
+                        </p>
+                        <div className="flex gap-2 flex-wrap">
+                          <Badge variant="outline" className="text-xs">🎵 Уникальные ноты</Badge>
+                          <Badge variant="outline" className="text-xs">🎶 Комбо мелодии</Badge>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        const newValue = !soundEnabled;
+                        setSoundEnabled(newValue);
+                        localStorage.setItem('soundEnabled', String(newValue));
+                        window.dispatchEvent(new CustomEvent('soundToggle', { detail: newValue }));
+                      }}
+                      variant={soundEnabled ? 'default' : 'outline'}
+                      size="lg"
+                    >
+                      {soundEnabled ? '🔊 Включено' : '🔇 Выключено'}
+                    </Button>
+                  </div>
+
+                  <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
+                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                      <Icon name="Zap" size={18} className="text-yellow-600" />
+                      Как работает комбо:
+                    </h4>
+                    <ul className="text-sm space-y-1 ml-6">
+                      <li>• Кликайте быстро (менее 0.5 сек между кликами)</li>
+                      <li>• Ромашки становятся больше с каждым кликом</li>
+                      <li>• Звуки становятся выше и интереснее</li>
+                      <li>• Максимум x10 комбо!</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-purple-50 border-2 border-purple-300 rounded-lg p-4">
+                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                      <Icon name="Palette" size={18} className="text-purple-600" />
+                      Цвета ромашек:
+                    </h4>
+                    <div className="grid grid-cols-4 gap-2 mt-3">
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="w-10 h-10 rounded-full bg-white border-4 border-yellow-400"></div>
+                        <span className="text-xs">Классика</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="w-10 h-10 rounded-full bg-pink-200 border-4 border-pink-500"></div>
+                        <span className="text-xs">Розовая</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="w-10 h-10 rounded-full bg-purple-200 border-4 border-purple-600"></div>
+                        <span className="text-xs">Фиолетовая</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="w-10 h-10 rounded-full bg-blue-200 border-4 border-blue-500"></div>
+                        <span className="text-xs">Голубая</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="w-10 h-10 rounded-full bg-orange-200 border-4 border-orange-500"></div>
+                        <span className="text-xs">Персиковая</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="w-10 h-10 rounded-full bg-yellow-200 border-4 border-yellow-500"></div>
+                        <span className="text-xs">Золотая</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="w-10 h-10 rounded-full bg-green-200 border-4 border-green-500"></div>
+                        <span className="text-xs">Мятная</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="w-10 h-10 rounded-full bg-pink-100 border-4 border-pink-300"></div>
+                        <span className="text-xs">Нежная</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="export" className="space-y-4 mt-4">

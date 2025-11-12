@@ -147,7 +147,12 @@ export default function Index({ onLogout }: IndexProps) {
   const [activeSection, setActiveSection] = useState<string>('tasks');
   const [showInDevelopment, setShowInDevelopment] = useState(false);
   const [educationChild, setEducationChild] = useState<FamilyMember | null>(null);
-  const [showClickEffect, setShowClickEffect] = useState(true);
+  const [chamomileEnabled, setChamomileEnabled] = useState(() => {
+    return localStorage.getItem('chamomileEnabled') !== 'false';
+  });
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    return localStorage.getItem('soundEnabled') !== 'false';
+  });
 
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const currentUser = familyMembers.find(m => m.user_id === user.id || m.id === user.member_id);
@@ -156,6 +161,23 @@ export default function Index({ onLogout }: IndexProps) {
   const handleLogoutLocal = () => {
     onLogout?.();
   };
+
+  useEffect(() => {
+    const handleChamomileToggle = (e: any) => {
+      setChamomileEnabled(e.detail);
+    };
+    const handleSoundToggle = (e: any) => {
+      setSoundEnabled(e.detail);
+    };
+    
+    window.addEventListener('chamomileToggle', handleChamomileToggle);
+    window.addEventListener('soundToggle', handleSoundToggle);
+    
+    return () => {
+      window.removeEventListener('chamomileToggle', handleChamomileToggle);
+      window.removeEventListener('soundToggle', handleSoundToggle);
+    };
+  }, []);
 
   useEffect(() => {
     if (!tasks || !Array.isArray(tasks)) {
@@ -1999,7 +2021,7 @@ export default function Index({ onLogout }: IndexProps) {
         </DialogContent>
       </Dialog>
       
-      {showClickEffect && <ClickChamomile onLoadingComplete={() => {}} />}
+      {chamomileEnabled && <ClickChamomile enabled={chamomileEnabled} soundEnabled={soundEnabled} />}
     </>
   );
 }
