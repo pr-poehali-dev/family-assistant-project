@@ -59,18 +59,56 @@ def register_user(phone: str, password: str, family_name: Optional[str] = None, 
         
         check_query = f"SELECT id FROM {SCHEMA}.users WHERE phone = {escape_string(phone)}"
         cur.execute(check_query)
-        if cur.fetchone():
+        existing_user = cur.fetchone()
+        
+        if existing_user and not invite_code:
             cur.close()
             conn.close()
             return {'error': 'Телефон уже зарегистрирован'}
         
-        insert_user = f"""
-            INSERT INTO {SCHEMA}.users (email, phone, password_hash, is_verified) 
-            VALUES (NULL, {escape_string(phone)}, {escape_string(password_hash)}, TRUE) 
-            RETURNING id, email, phone, created_at
-        """
-        cur.execute(insert_user)
-        user = cur.fetchone()
+        if existing_user and invite_code:
+            user_id = existing_user['id']
+            
+            cur.execute(
+                f"SELECT family_id FROM {SCHEMA}.family_members WHERE user_id = {escape_string(user_id)}"
+            )
+            old_member = cur.fetchone()
+            
+            if old_member:
+                old_family_id = old_member['family_id']
+                
+                cur.execute(
+                    f"SELECT COUNT(*) as count FROM {SCHEMA}.family_members WHERE family_id = {escape_string(old_family_id)}"
+                )
+                members_count = cur.fetchone()['count']
+                
+                if members_count <= 1:
+                    cur.execute(f"DELETE FROM {SCHEMA}.tasks WHERE family_id = {escape_string(old_family_id)}")
+                    cur.execute(f"DELETE FROM {SCHEMA}.family_invites WHERE family_id = {escape_string(old_family_id)}")
+                    cur.execute(f"DELETE FROM {SCHEMA}.family_members WHERE family_id = {escape_string(old_family_id)}")
+                    cur.execute(f"DELETE FROM {SCHEMA}.families WHERE id = {escape_string(old_family_id)}")
+                else:
+                    cur.execute(f"DELETE FROM {SCHEMA}.family_members WHERE user_id = {escape_string(user_id)}")
+            
+            update_password = f"""
+                UPDATE {SCHEMA}.users 
+                SET password_hash = {escape_string(password_hash)}
+                WHERE id = {escape_string(user_id)}
+            """
+            cur.execute(update_password)
+            
+            user = {'id': user_id, 'email': None, 'phone': phone, 'created_at': None}
+        else:
+            existing_user = None
+        
+        if not existing_user:
+            insert_user = f"""
+                INSERT INTO {SCHEMA}.users (email, phone, password_hash, is_verified) 
+                VALUES (NULL, {escape_string(phone)}, {escape_string(password_hash)}, TRUE) 
+                RETURNING id, email, phone, created_at
+            """
+            cur.execute(insert_user)
+            user = cur.fetchone()
         
         token = generate_token()
         expires_at = datetime.now() + timedelta(days=30)
