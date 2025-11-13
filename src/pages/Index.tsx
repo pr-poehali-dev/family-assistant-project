@@ -50,10 +50,6 @@ import { getTranslation, type LanguageCode } from '@/translations';
 import FamilyInviteManager from '@/components/FamilyInviteManager';
 import BottomBar from '@/components/BottomBar';
 import PanelSettings from '@/components/PanelSettings';
-import TopBar from '@/components/layout/TopBar';
-import LeftSidebar from '@/components/layout/LeftSidebar';
-import RightSidebar from '@/components/layout/RightSidebar';
-import MainContent from '@/components/layout/MainContent';
 
 interface IndexProps {
   onLogout?: () => void;
