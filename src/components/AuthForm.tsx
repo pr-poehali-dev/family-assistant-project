@@ -80,12 +80,12 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
       const requestBody: any = {
         phone: registerData.phone,
         password: registerData.password,
-        family_name: registerData.familyName || undefined
+        family_name: registerData.familyName || undefined,
+        name: registerData.memberName
       };
       
       if (registerStep === 'join' && registerData.inviteCode) {
         requestBody.invite_code = registerData.inviteCode.toUpperCase();
-        requestBody.name = registerData.memberName;
         requestBody.relationship = registerData.relationship === 'Другое' 
           ? registerData.customRelationship 
           : registerData.relationship;
@@ -111,27 +111,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
           localStorage.setItem('user', JSON.stringify(data.user));
           localStorage.setItem('needsProfileSetup', 'true');
           
-          if (registerStep === 'join') {
-            onAuthSuccess(data.token, data.user);
-          } else {
-            const updateResponse = await fetch('https://functions.poehali.dev/8a66ac8a-2cc8-40f0-9fda-ec4d14b08dcf', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-Auth-Token': data.token
-              },
-              body: JSON.stringify({
-                action: 'update',
-                member_id: data.user.member_id,
-                name: registerData.memberName,
-                role: 'Владелец'
-              })
-            });
-            
-            await updateResponse.json();
-            localStorage.setItem('needsProfileSetup', 'true');
-            onAuthSuccess(data.token, data.user);
-          }
+          onAuthSuccess(data.token, data.user);
         }
       } catch (parseErr) {
         setError(`Ошибка сервера (${response.status}): Сервер вернул не JSON. Возможно проблема с базой данных.`);
