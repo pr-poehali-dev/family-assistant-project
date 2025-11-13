@@ -21,19 +21,36 @@ interface FamilyMember {
   responsibilities?: string[];
 }
 
-const STORAGE_KEY = 'family_members';
+const FAMILY_MEMBERS_API = 'https://functions.poehali.dev/39a1ae0b-c445-4408-80a0-ce02f5a25ce5';
 
 export function useFamilyMembers() {
   const [members, setMembers] = useState<FamilyMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadMembers = () => {
+  const getAuthToken = () => localStorage.getItem('authToken') || '';
+
+  const fetchMembers = async () => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        setMembers(JSON.parse(stored));
+      setLoading(true);
+      const response = await fetch(FAMILY_MEMBERS_API, {
+        method: 'GET',
+        headers: {
+          'X-Auth-Token': getAuthToken()
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка загрузки членов семьи');
+      }
+
+      const data = await response.json();
+      
+      if (data.success && data.members) {
+        setMembers(data.members);
+        setError(null);
       } else {
+        setError(data.error || 'Ошибка загрузки');
         setMembers([]);
       }
     } catch (err) {
@@ -44,49 +61,61 @@ export function useFamilyMembers() {
     }
   };
 
-  const saveMembers = (newMembers: FamilyMember[]) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newMembers));
-    setMembers(newMembers);
-  };
-
-  const fetchMembers = async () => {
-    loadMembers();
-  };
-
   const addMember = async (memberData: Partial<FamilyMember>) => {
     try {
-      const newMember: FamilyMember = {
-        id: Date.now().toString(),
-        name: memberData.name || '',
-        role: memberData.role || '',
-        avatar: memberData.avatar || '👤',
-        avatar_type: memberData.avatar_type || 'emoji',
-        points: 0,
-        level: 1,
-        workload: 0,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        ...memberData
-      };
+      const response = await fetch(FAMILY_MEMBERS_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': getAuthToken()
+        },
+        body: JSON.stringify({
+          action: 'add',
+          ...memberData
+        })
+      });
+
+      const data = await response.json();
       
-      const updated = [...members, newMember];
-      saveMembers(updated);
-      return { success: true, member: newMember };
+      if (data.success) {
+        await fetchMembers();
+        return { success: true, member: data.member };
+      } else {
+        return { success: false, error: data.error };
+      }
     } catch (err) {
       return { success: false, error: 'Ошибка добавления члена семьи' };
     }
   };
 
-  const updateMember = async (memberData: Partial<FamilyMember> & { id: string }) => {
+  const updateMember = async (memberData: Partial<FamilyMember> & { id?: string; member_id?: string }) => {
     try {
-      const updated = members.map(m => 
-        m.id === memberData.id 
-          ? { ...m, ...memberData, updated_at: new Date().toISOString() }
-          : m
-      );
-      saveMembers(updated);
-      const updatedMember = updated.find(m => m.id === memberData.id);
-      return { success: true, member: updatedMember };
+      const memberId = memberData.id || memberData.member_id;
+      if (!memberId) {
+        return { success: false, error: 'Не указан ID члена семьи' };
+      }
+
+      const response = await fetch(FAMILY_MEMBERS_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': getAuthToken()
+        },
+        body: JSON.stringify({
+          action: 'update',
+          member_id: memberId,
+          ...memberData
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        await fetchMembers();
+        return { success: true, member: data.member };
+      } else {
+        return { success: false, error: data.error };
+      }
     } catch (err) {
       return { success: false, error: 'Ошибка обновления члена семьи' };
     }
@@ -94,16 +123,44 @@ export function useFamilyMembers() {
 
   const deleteMember = async (memberId: string) => {
     try {
-      const updated = members.filter(m => m.id !== memberId);
-      saveMembers(updated);
-      return { success: true };
+      const response = await fetch(FAMILY_MEMBERS_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': getAuthToken()
+        },
+        body: JSON.stringify({
+          action: 'delete',
+          member_id: memberId
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        await fetchMembers();
+        return { success: true };
+      } else {
+        return { success: false, error: data.error };
+      }
     } catch (err) {
       return { success: false, error: 'Ошибка удаления члена семьи' };
     }
   };
 
   useEffect(() => {
-    loadMembers();
+    const token = getAuthToken();
+    if (token) {
+      fetchMembers();
+      
+      const interval = setInterval(() => {
+        fetchMembers();
+      }, 5000);
+      
+      return () => clearInterval(interval);
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   return {

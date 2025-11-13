@@ -250,7 +250,33 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             body = json.loads(event.get('body', '{}'))
-            result = add_family_member(family_id, body)
+            action = body.get('action', 'add')
+            
+            if action == 'update':
+                member_id = body.get('member_id') or body.get('id')
+                if not member_id:
+                    return {
+                        'statusCode': 400,
+                        'headers': headers,
+                        'body': json.dumps({'error': 'Требуется ID члена семьи'}),
+                        'isBase64Encoded': False
+                    }
+                result = update_family_member(member_id, family_id, body)
+                status_code = 200 if 'success' in result else 400
+            elif action == 'delete':
+                member_id = body.get('member_id') or body.get('id')
+                if not member_id:
+                    return {
+                        'statusCode': 400,
+                        'headers': headers,
+                        'body': json.dumps({'error': 'Требуется ID члена семьи'}),
+                        'isBase64Encoded': False
+                    }
+                result = delete_family_member(member_id, family_id)
+                status_code = 200 if 'success' in result else 400
+            else:
+                result = add_family_member(family_id, body)
+                status_code = 201 if 'success' in result else 400
             
             if 'error' in result:
                 return {
@@ -261,7 +287,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             return {
-                'statusCode': 201,
+                'statusCode': status_code,
                 'headers': headers,
                 'body': json.dumps(result, default=str),
                 'isBase64Encoded': False
