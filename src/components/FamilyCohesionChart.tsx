@@ -2,32 +2,35 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, ResponsiveContainer, Tooltip } from 'recharts';
-
-interface CohesionMetrics {
-  category: string;
-  score: number;
-  maxScore: number;
-  icon: string;
-}
+import type { FamilyMember, Task } from '@/types/family.types';
+import { calculateFamilyCohesion, calculateFamilyRank } from '@/utils/cohesionCalculator';
 
 interface FamilyCohesionChartProps {
-  familyRank?: number;
+  familyMembers: FamilyMember[];
+  tasks: Task[];
+  chatMessagesCount?: number;
+  albumPhotosCount?: number;
+  lastActivityDays?: number;
   totalFamilies?: number;
 }
 
-export function FamilyCohesionChart({ familyRank = 142, totalFamilies = 1250 }: FamilyCohesionChartProps) {
-  const cohesionMetrics: CohesionMetrics[] = [
-    { category: 'Задачи', score: 85, maxScore: 100, icon: 'CheckSquare' },
-    { category: 'Традиции', score: 92, maxScore: 100, icon: 'Heart' },
-    { category: 'Общение', score: 78, maxScore: 100, icon: 'MessageCircle' },
-    { category: 'Ценности', score: 88, maxScore: 100, icon: 'Star' },
-    { category: 'Активность', score: 75, maxScore: 100, icon: 'Activity' },
-    { category: 'Поддержка', score: 90, maxScore: 100, icon: 'HandHelping' }
-  ];
-
-  const averageScore = Math.round(
-    cohesionMetrics.reduce((sum, m) => sum + m.score, 0) / cohesionMetrics.length
+export function FamilyCohesionChart({ 
+  familyMembers,
+  tasks,
+  chatMessagesCount = 0,
+  albumPhotosCount = 0,
+  lastActivityDays = 0,
+  totalFamilies = 1250 
+}: FamilyCohesionChartProps) {
+  const { metrics: cohesionMetrics, averageScore, totalPoints } = calculateFamilyCohesion(
+    familyMembers,
+    tasks,
+    chatMessagesCount,
+    albumPhotosCount,
+    lastActivityDays
   );
+
+  const familyRank = calculateFamilyRank(averageScore, totalPoints, totalFamilies);
 
   const radarData = cohesionMetrics.map(m => ({
     category: m.category,
@@ -101,15 +104,19 @@ export function FamilyCohesionChart({ familyRank = 142, totalFamilies = 1250 }: 
               return (
                 <div
                   key={metric.category}
-                  className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200"
+                  className="flex flex-col gap-2 p-3 rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200"
+                  title={metric.details}
                 >
-                  <div className="bg-white p-2 rounded-lg">
-                    <Icon name={metric.icon as any} size={20} className="text-purple-600" />
+                  <div className="flex items-center gap-2">
+                    <div className="bg-white p-2 rounded-lg">
+                      <Icon name={metric.icon as any} size={20} className="text-purple-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-muted-foreground truncate">{metric.category}</p>
+                      <p className={`text-lg font-bold ${level.textColor}`}>{metric.score}</p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-muted-foreground truncate">{metric.category}</p>
-                    <p className={`text-lg font-bold ${level.textColor}`}>{metric.score}</p>
-                  </div>
+                  <p className="text-[10px] text-muted-foreground truncate">{metric.details}</p>
                 </div>
               );
             })}
