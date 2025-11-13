@@ -41,7 +41,7 @@ def get_db_connection():
     conn.autocommit = True
     return conn
 
-def register_user(phone: str, password: str, family_name: Optional[str] = None) -> Dict[str, Any]:
+def register_user(phone: str, password: str, family_name: Optional[str] = None, skip_family_creation: bool = False) -> Dict[str, Any]:
     if not phone:
         return {'error': 'Телефон обязателен'}
     
@@ -72,33 +72,6 @@ def register_user(phone: str, password: str, family_name: Optional[str] = None) 
         cur.execute(insert_user)
         user = cur.fetchone()
         
-        default_family_name = family_name or f"Семья {phone}"
-        insert_family = f"""
-            INSERT INTO {SCHEMA}.families (name) 
-            VALUES ({escape_string(default_family_name)}) 
-            RETURNING id, name
-        """
-        cur.execute(insert_family)
-        family = cur.fetchone()
-        
-        member_name = phone[-4:]
-        insert_member = f"""
-            INSERT INTO {SCHEMA}.family_members 
-            (family_id, user_id, name, role, points, level, workload, avatar, avatar_type) 
-            VALUES (
-                {escape_string(family['id'])}, 
-                {escape_string(user['id'])}, 
-                {escape_string(member_name)}, 
-                {escape_string('Владелец')}, 
-                0, 1, 0, 
-                {escape_string('👤')}, 
-                {escape_string('emoji')}
-            )
-            RETURNING id
-        """
-        cur.execute(insert_member)
-        member = cur.fetchone()
-        
         token = generate_token()
         expires_at = datetime.now() + timedelta(days=30)
         
@@ -112,20 +85,51 @@ def register_user(phone: str, password: str, family_name: Optional[str] = None) 
         """
         cur.execute(insert_session)
         
+        user_data = {
+            'id': str(user['id']),
+            'email': user['email'],
+            'phone': user['phone']
+        }
+        
+        if not skip_family_creation:
+            default_family_name = family_name or f"Семья {phone}"
+            insert_family = f"""
+                INSERT INTO {SCHEMA}.families (name) 
+                VALUES ({escape_string(default_family_name)}) 
+                RETURNING id, name
+            """
+            cur.execute(insert_family)
+            family = cur.fetchone()
+            
+            member_name = phone[-4:]
+            insert_member = f"""
+                INSERT INTO {SCHEMA}.family_members 
+                (family_id, user_id, name, role, points, level, workload, avatar, avatar_type) 
+                VALUES (
+                    {escape_string(family['id'])}, 
+                    {escape_string(user['id'])}, 
+                    {escape_string(member_name)}, 
+                    {escape_string('Владелец')}, 
+                    0, 1, 0, 
+                    {escape_string('👤')}, 
+                    {escape_string('emoji')}
+                )
+                RETURNING id
+            """
+            cur.execute(insert_member)
+            member = cur.fetchone()
+            
+            user_data['family_id'] = str(family['id'])
+            user_data['family_name'] = family['name']
+            user_data['member_id'] = str(member['id'])
+        
         cur.close()
         conn.close()
         
         return {
             'success': True,
             'token': token,
-            'user': {
-                'id': str(user['id']),
-                'email': user['email'],
-                'phone': user['phone'],
-                'family_id': str(family['id']),
-                'family_name': family['name'],
-                'member_id': str(member['id'])
-            }
+            'user': user_data
         }
     except Exception as e:
         cur.close()
@@ -527,10 +531,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         if method == 'POST':
             if path == 'register':
+                invite_code = body.get('invite_code', '')
+                skip_family = bool(invite_code)
                 result = register_user(
                     body.get('phone', ''),
                     body.get('password', ''),
-                    body.get('family_name')
+                    body.get('family_name'),
+                    skip_family_creation=skip_family
                 )
                 if 'error' in result:
                     return {
