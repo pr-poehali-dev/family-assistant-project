@@ -910,7 +910,7 @@ export default function Index({ onLogout }: IndexProps) {
               
               {currentUser && (
                 <Button
-                  onClick={() => navigate(`/member/${currentUser.member_id}`)}
+                  onClick={() => navigate(`/member/${currentUser.id}`)}
                   variant="ghost"
                   size="sm"
                   className="h-9 w-9 p-0"

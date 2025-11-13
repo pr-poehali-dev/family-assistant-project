@@ -111,39 +111,43 @@ export default function SettingsMenu() {
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-2xl">
-              <Icon name="Settings" size={28} />
-              Настройки и управление
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col p-0">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b">
+            <DialogTitle className="flex items-center gap-2 text-xl md:text-2xl">
+              <Icon name="Settings" size={24} />
+              Настройки
             </DialogTitle>
           </DialogHeader>
 
-          <Tabs defaultValue="invites" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="invites">
-                <Icon name="Users" className="mr-2" size={16} />
-                Приглашения
+          <Tabs defaultValue="invites" className="w-full flex-1 overflow-hidden flex flex-col">
+            <TabsList className="grid w-full grid-cols-4 mx-6 my-2">
+              <TabsTrigger value="invites" className="text-xs md:text-sm">
+                <Icon name="Users" className="mr-1 md:mr-2" size={14} />
+                <span className="hidden sm:inline">Приглашения</span>
+                <span className="sm:hidden">Семья</span>
               </TabsTrigger>
-              <TabsTrigger value="effects">
-                <Icon name="Sparkles" className="mr-2" size={16} />
-                Эффекты
+              <TabsTrigger value="effects" className="text-xs md:text-sm">
+                <Icon name="Sparkles" className="mr-1 md:mr-2" size={14} />
+                <span className="hidden sm:inline">Эффекты</span>
+                <span className="sm:hidden">FX</span>
               </TabsTrigger>
-              <TabsTrigger value="export">
-                <Icon name="Download" className="mr-2" size={16} />
-                Экспорт
+              <TabsTrigger value="export" className="text-xs md:text-sm">
+                <Icon name="Download" className="mr-1 md:mr-2" size={14} />
+                <span className="hidden sm:inline">Экспорт</span>
+                <span className="sm:hidden">Файл</span>
               </TabsTrigger>
-              <TabsTrigger value="subscription">
-                <Icon name="CreditCard" className="mr-2" size={16} />
-                Подписка
+              <TabsTrigger value="subscription" className="text-xs md:text-sm">
+                <Icon name="CreditCard" className="mr-1 md:mr-2" size={14} />
+                <span className="hidden sm:inline">Подписка</span>
+                <span className="sm:hidden">PRO</span>
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="invites" className="space-y-4 mt-4">
+            <TabsContent value="invites" className="flex-1 overflow-y-auto px-6 pb-6">
               <FamilyInviteManager />
             </TabsContent>
 
-            <TabsContent value="effects" className="space-y-4 mt-4">
+            <TabsContent value="effects" className="flex-1 overflow-y-auto px-6 pb-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -269,7 +273,7 @@ export default function SettingsMenu() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="export" className="space-y-4 mt-4">
+            <TabsContent value="export" className="flex-1 overflow-y-auto px-6 pb-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -338,7 +342,7 @@ export default function SettingsMenu() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="subscription" className="space-y-4 mt-4">
+            <TabsContent value="subscription" className="flex-1 overflow-y-auto px-6 pb-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
