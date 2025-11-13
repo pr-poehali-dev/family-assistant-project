@@ -56,6 +56,7 @@ import { FamilyMembersGrid } from '@/components/FamilyMembersGrid';
 import { getTranslation, type LanguageCode } from '@/translations';
 import SettingsMenu from '@/components/SettingsMenu';
 import FamilyInviteManager from '@/components/FamilyInviteManager';
+import { FamilyCohesionChart } from '@/components/FamilyCohesionChart';
 
 interface IndexProps {
   onLogout?: () => void;
@@ -1426,6 +1427,8 @@ export default function Index({ onLogout }: IndexProps) {
           </Card>
         </div>
 
+        <FamilyCohesionChart familyRank={142} totalFamilies={1250} />
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <Tabs value={activeSection} onValueChange={setActiveSection} className="space-y-6">
@@ -1586,6 +1589,14 @@ export default function Index({ onLogout }: IndexProps) {
                   </TooltipContent>
                 </Tooltip>
                 
+                <Button
+                  onClick={() => navigate('/family-code')}
+                  variant="outline"
+                  className="text-xs lg:text-sm py-2 px-3 whitespace-nowrap border-purple-300 bg-purple-50 hover:bg-purple-100"
+                >
+                  <Icon name="Scale" className="mr-1" size={14} />
+                  Семейный кодекс
+                </Button>
 
               </TabsList>
 

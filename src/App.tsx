@@ -19,6 +19,7 @@ import FamilySetup from "./components/FamilySetup";
 import Community from "./pages/Community";
 import MemberProfile from "./pages/MemberProfile";
 import DebugAuth from "./pages/DebugAuth";
+import FamilyCode from "./pages/FamilyCode";
 
 const queryClient = new QueryClient();
 
@@ -140,6 +141,7 @@ const App = () => {
             <Route path="/pets" element={<Pets />} />
             <Route path="/community" element={<Community />} />
             <Route path="/member/:memberId" element={<MemberProfile />} />
+            <Route path="/family-code" element={<FamilyCode />} />
             <Route path="/debug-auth" element={<DebugAuth />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
