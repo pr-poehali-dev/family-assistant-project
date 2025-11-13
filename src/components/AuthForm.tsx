@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import Icon from '@/components/ui/icon';
 import ForgotPassword from './ForgotPassword';
+import AuthFormHeader from './auth/AuthFormHeader';
+import LoginForm from './auth/LoginForm';
+import RegisterForm from './auth/RegisterForm';
 
 interface AuthFormProps {
   onAuthSuccess: (token: string, user: any) => void;
@@ -179,17 +177,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
       <Card className="w-full max-w-md border-2 border-blue-200">
-        <CardHeader>
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-              <Icon name="Users" className="text-white" size={32} />
-            </div>
-          </div>
-          <CardTitle className="text-3xl text-center">Семейный Органайзер</CardTitle>
-          <CardDescription className="text-center">
-            Войдите по номеру телефона
-          </CardDescription>
-        </CardHeader>
+        <AuthFormHeader />
         
         <CardContent>
           <Tabs defaultValue="login" className="w-full" onValueChange={() => {
@@ -202,355 +190,29 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
             </TabsList>
             
             <TabsContent value="login">
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Телефон</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="+79991234567"
-                    value={loginData.phone}
-                    onChange={(e) => setLoginData({ ...loginData, phone: e.target.value })}
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="password">Пароль</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Минимум 6 символов"
-                    value={loginData.password}
-                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                    required
-                  />
-                </div>
-                
-                {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-lg text-sm">
-                    {error}
-                  </div>
-                )}
-                
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Icon name="Loader" className="mr-2 animate-spin" size={16} />
-                      Вход...
-                    </>
-                  ) : (
-                    <>
-                      <Icon name="LogIn" className="mr-2" size={16} />
-                      Войти
-                    </>
-                  )}
-                </Button>
-                
-                <Button
-                  type="button"
-                  variant="link"
-                  className="w-full text-purple-600 hover:text-purple-700"
-                  onClick={() => setShowForgotPassword(true)}
-                >
-                  <Icon name="KeyRound" className="mr-2" size={16} />
-                  Забыли пароль?
-                </Button>
-              </form>
+              <LoginForm
+                loginData={loginData}
+                setLoginData={setLoginData}
+                error={error}
+                isLoading={isLoading}
+                onSubmit={handleLogin}
+                onForgotPassword={() => setShowForgotPassword(true)}
+              />
             </TabsContent>
             
             <TabsContent value="register">
-              {registerStep === 'choice' && (
-                <div className="space-y-4 animate-fade-in">
-                  <div className="text-center mb-4">
-                    <h3 className="text-lg font-semibold mb-2">Выберите вариант</h3>
-                    <p className="text-sm text-gray-600">Вы создаёте новую семью или присоединяетесь к существующей?</p>
-                  </div>
-
-                  <Button
-                    type="button"
-                    onClick={() => setRegisterStep('create')}
-                    className="w-full h-auto py-6 flex flex-col items-start gap-2 bg-gradient-to-r from-blue-600 to-purple-600"
-                  >
-                    <div className="flex items-center gap-2 text-left w-full">
-                      <Icon name="PlusCircle" size={24} />
-                      <span className="text-lg font-bold">Создать новую семью</span>
-                    </div>
-                    <p className="text-xs text-left opacity-90">
-                      Я первый пользователь, хочу создать свою семью
-                    </p>
-                  </Button>
-
-                  <Button
-                    type="button"
-                    onClick={() => setRegisterStep('join')}
-                    variant="outline"
-                    className="w-full h-auto py-6 flex flex-col items-start gap-2 border-2 border-purple-300"
-                  >
-                    <div className="flex items-center gap-2 text-left w-full">
-                      <Icon name="UserPlus" size={24} />
-                      <span className="text-lg font-bold">Присоединиться к семье</span>
-                    </div>
-                    <p className="text-xs text-left text-gray-600">
-                      У меня есть код приглашения от родственника
-                    </p>
-                  </Button>
-
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-gray-700">
-                    <Icon name="Info" size={14} className="inline mr-1" />
-                    После регистрации вы сможете пригласить родственников в семью
-                  </div>
-                </div>
-              )}
-
-              {registerStep === 'create' && (
-                <form onSubmit={handleRegister} className="space-y-4 animate-fade-in">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setRegisterStep('choice')}
-                    className="mb-2"
-                  >
-                    <Icon name="ArrowLeft" className="mr-2" size={16} />
-                    Назад
-                  </Button>
-
-                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-300 rounded-lg p-4 mb-4">
-                    <h3 className="font-bold text-lg mb-1 flex items-center gap-2">
-                      <Icon name="Sparkles" size={20} />
-                      Создание новой семьи
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      Вы станете владельцем семьи и сможете приглашать родственников
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-name">Ваше имя *</Label>
-                    <Input
-                      id="reg-name"
-                      type="text"
-                      placeholder="Александр"
-                      value={registerData.memberName}
-                      onChange={(e) => setRegisterData({ ...registerData, memberName: e.target.value })}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-family">Название семьи</Label>
-                    <Input
-                      id="reg-family"
-                      type="text"
-                      placeholder="Семья Ивановых (необязательно)"
-                      value={registerData.familyName}
-                      onChange={(e) => setRegisterData({ ...registerData, familyName: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-phone">Телефон *</Label>
-                    <Input
-                      id="reg-phone"
-                      type="tel"
-                      placeholder="+79991234567"
-                      value={registerData.phone}
-                      onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-password">Пароль *</Label>
-                    <Input
-                      id="reg-password"
-                      type="password"
-                      placeholder="Минимум 6 символов"
-                      value={registerData.password}
-                      onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-confirm">Подтвердите пароль *</Label>
-                    <Input
-                      id="reg-confirm"
-                      type="password"
-                      placeholder="Повторите пароль"
-                      value={registerData.confirmPassword}
-                      onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
-                      required
-                    />
-                  </div>
-                  
-                  {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-lg text-sm">
-                      {error}
-                    </div>
-                  )}
-                  
-                  <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600" disabled={isLoading}>
-                    {isLoading ? (
-                      <>
-                        <Icon name="Loader" className="mr-2 animate-spin" size={16} />
-                        Создание семьи...
-                      </>
-                    ) : (
-                      <>
-                        <Icon name="Sparkles" className="mr-2" size={16} />
-                        Создать семью
-                      </>
-                    )}
-                  </Button>
-                </form>
-              )}
-
-              {registerStep === 'join' && (
-                <form onSubmit={handleRegister} className="space-y-4 animate-fade-in">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setRegisterStep('choice')}
-                    className="mb-2"
-                  >
-                    <Icon name="ArrowLeft" className="mr-2" size={16} />
-                    Назад
-                  </Button>
-
-                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-300 rounded-lg p-4 mb-4">
-                    <h3 className="font-bold text-lg mb-1 flex items-center gap-2">
-                      <Icon name="UserPlus" size={20} />
-                      Присоединение к семье
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      Попросите владельца семьи создать код приглашения
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="join-code">Код приглашения *</Label>
-                    <Input
-                      id="join-code"
-                      type="text"
-                      placeholder="ABC12345"
-                      value={registerData.inviteCode}
-                      onChange={(e) => setRegisterData({ ...registerData, inviteCode: e.target.value.toUpperCase() })}
-                      maxLength={8}
-                      required
-                    />
-                    <p className="text-xs text-gray-500">8 символов (буквы и цифры)</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="join-name">Ваше имя *</Label>
-                    <Input
-                      id="join-name"
-                      type="text"
-                      placeholder="Максим"
-                      value={registerData.memberName}
-                      onChange={(e) => setRegisterData({ ...registerData, memberName: e.target.value })}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="join-relationship">Степень родства *</Label>
-                    <Select 
-                      value={registerData.relationship} 
-                      onValueChange={(value) => setRegisterData({ ...registerData, relationship: value })}
-                      required
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Выберите" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {RELATIONSHIPS.map((rel) => (
-                          <SelectItem key={rel} value={rel}>{rel}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {registerData.relationship === 'Другое' && (
-                    <div className="space-y-2">
-                      <Label htmlFor="custom-rel">Укажите своё родство *</Label>
-                      <Input
-                        id="custom-rel"
-                        type="text"
-                        placeholder="Опекун, Крёстный..."
-                        value={registerData.customRelationship}
-                        onChange={(e) => setRegisterData({ ...registerData, customRelationship: e.target.value })}
-                        required
-                      />
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <Label htmlFor="join-phone">Телефон *</Label>
-                    <Input
-                      id="join-phone"
-                      type="tel"
-                      placeholder="+79991234567"
-                      value={registerData.phone}
-                      onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="join-password">Пароль *</Label>
-                    <Input
-                      id="join-password"
-                      type="password"
-                      placeholder="Минимум 6 символов"
-                      value={registerData.password}
-                      onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="join-confirm">Подтвердите пароль *</Label>
-                    <Input
-                      id="join-confirm"
-                      type="password"
-                      placeholder="Повторите пароль"
-                      value={registerData.confirmPassword}
-                      onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
-                      required
-                    />
-                  </div>
-                  
-                  {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-lg text-sm">
-                      {error}
-                    </div>
-                  )}
-                  
-                  <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600" disabled={isLoading}>
-                    {isLoading ? (
-                      <>
-                        <Icon name="Loader" className="mr-2 animate-spin" size={16} />
-                        Присоединение...
-                      </>
-                    ) : (
-                      <>
-                        <Icon name="UserPlus" className="mr-2" size={16} />
-                        Присоединиться к семье
-                      </>
-                    )}
-                  </Button>
-                </form>
-              )}
+              <RegisterForm
+                registerData={registerData}
+                setRegisterData={setRegisterData}
+                registerStep={registerStep}
+                setRegisterStep={setRegisterStep}
+                error={error}
+                isLoading={isLoading}
+                onSubmit={handleRegister}
+                relationships={RELATIONSHIPS}
+              />
             </TabsContent>
           </Tabs>
-          
-          <div className="mt-6 text-center text-sm text-gray-600">
-            <p>Регистрируясь, вы соглашаетесь с условиями использования</p>
-          </div>
         </CardContent>
       </Card>
     </div>
