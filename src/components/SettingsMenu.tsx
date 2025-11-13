@@ -9,6 +9,7 @@ import FamilyInviteManager from './FamilyInviteManager';
 
 const EXPORT_API = 'https://functions.poehali.dev/6db20156-2ce6-4ba2-923b-b3e8faf8a58b';
 const PAYMENTS_API = 'https://functions.poehali.dev/a1b737ac-9612-4a1f-8262-c10e4c498d6d';
+const AUTH_API = 'https://functions.poehali.dev/b9b956c8-e2a6-4c20-aef8-b8422e8cb3b0';
 
 export default function SettingsMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,6 +22,8 @@ export default function SettingsMenu() {
   const [soundEnabled, setSoundEnabled] = useState(() => {
     return localStorage.getItem('soundEnabled') !== 'false';
   });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const getAuthToken = () => localStorage.getItem('authToken') || '';
 
@@ -98,6 +101,34 @@ export default function SettingsMenu() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`${AUTH_API}?action=delete_account`, {
+        method: 'POST',
+        headers: {
+          'X-Auth-Token': getAuthToken()
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        alert('✅ Аккаунт успешно удалён');
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        window.location.href = '/auth';
+      } else {
+        alert(`❌ ${data.error}`);
+      }
+    } catch (error) {
+      alert('❌ Ошибка удаления аккаунта');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
   return (
     <>
       <Button
@@ -120,7 +151,7 @@ export default function SettingsMenu() {
           </DialogHeader>
 
           <Tabs defaultValue="invites" className="w-full flex-1 overflow-hidden flex flex-col">
-            <TabsList className="grid w-full grid-cols-4 mx-6 my-2">
+            <TabsList className="grid w-full grid-cols-5 mx-6 my-2">
               <TabsTrigger value="invites" className="text-xs md:text-sm">
                 <Icon name="Users" className="mr-1 md:mr-2" size={14} />
                 <span className="hidden sm:inline">Приглашения</span>
@@ -140,6 +171,11 @@ export default function SettingsMenu() {
                 <Icon name="CreditCard" className="mr-1 md:mr-2" size={14} />
                 <span className="hidden sm:inline">Подписка</span>
                 <span className="sm:hidden">PRO</span>
+              </TabsTrigger>
+              <TabsTrigger value="account" className="text-xs md:text-sm">
+                <Icon name="UserCog" className="mr-1 md:mr-2" size={14} />
+                <span className="hidden sm:inline">Аккаунт</span>
+                <span className="sm:hidden">Я</span>
               </TabsTrigger>
             </TabsList>
 
@@ -441,6 +477,90 @@ export default function SettingsMenu() {
                     <Icon name="RefreshCw" className="mr-2" size={16} />
                     Обновить статус подписки
                   </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="account" className="flex-1 overflow-y-auto px-6 pb-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="UserCog" size={24} />
+                    Управление аккаунтом
+                  </CardTitle>
+                  <CardDescription>
+                    Настройки вашего профиля и удаление данных
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="bg-red-50 border-2 border-red-300 rounded-lg p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="text-4xl">⚠️</div>
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold text-red-700 mb-2">Удаление аккаунта</h3>
+                        <p className="text-sm text-gray-700 mb-4">
+                          После удаления аккаунта:
+                        </p>
+                        <ul className="text-sm text-gray-600 space-y-1 mb-4 ml-4">
+                          <li>• Ваш телефон станет доступен для регистрации</li>
+                          <li>• Все ваши данные будут безвозвратно удалены</li>
+                          <li>• Если вы единственный в семье - семья будет удалена</li>
+                          <li>• Если в семье есть другие члены - вы будете исключены</li>
+                          <li>• Действие нельзя отменить</li>
+                        </ul>
+                        
+                        {!showDeleteConfirm ? (
+                          <Button
+                            onClick={() => setShowDeleteConfirm(true)}
+                            variant="destructive"
+                            className="w-full"
+                          >
+                            <Icon name="Trash2" className="mr-2" size={16} />
+                            Удалить аккаунт
+                          </Button>
+                        ) : (
+                          <div className="space-y-3">
+                            <div className="bg-white border-2 border-red-500 rounded-lg p-4">
+                              <p className="text-sm font-bold text-red-700 mb-2">
+                                ⚠️ Вы уверены? Это действие необратимо!
+                              </p>
+                              <p className="text-xs text-gray-600">
+                                Все ваши данные, задачи, фото и записи будут удалены навсегда.
+                              </p>
+                            </div>
+                            
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={() => setShowDeleteConfirm(false)}
+                                variant="outline"
+                                className="flex-1"
+                              >
+                                Отмена
+                              </Button>
+                              <Button
+                                onClick={handleDeleteAccount}
+                                disabled={isDeleting}
+                                variant="destructive"
+                                className="flex-1"
+                              >
+                                {isDeleting ? (
+                                  <>
+                                    <Icon name="Loader2" className="mr-2 h-4 w-4 animate-spin" size={16} />
+                                    Удаление...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Icon name="Trash2" className="mr-2" size={16} />
+                                    Да, удалить навсегда
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>

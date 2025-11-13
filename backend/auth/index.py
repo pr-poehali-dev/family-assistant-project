@@ -454,6 +454,50 @@ def reset_password(reset_token: str, new_password: str) -> Dict[str, Any]:
             conn.close()
         return {'error': f'Ошибка: {str(e)}'}
 
+def delete_account(token: str) -> Dict[str, Any]:
+    user = verify_token(token)
+    if not user:
+        return {'error': 'Неверный токен'}
+    
+    user_id = user['id']
+    conn = None
+    cur = None
+    
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        
+        cur.execute(f"DELETE FROM {SCHEMA}.sessions WHERE user_id = {escape_string(user_id)}")
+        cur.execute(f"DELETE FROM {SCHEMA}.password_reset_tokens WHERE user_id = {escape_string(user_id)}")
+        
+        cur.execute(f"SELECT family_id FROM {SCHEMA}.family_members WHERE user_id = {escape_string(user_id)}")
+        member_data = cur.fetchone()
+        
+        if member_data:
+            family_id = member_data['family_id']
+            
+            cur.execute(f"SELECT COUNT(*) as count FROM {SCHEMA}.family_members WHERE family_id = {escape_string(family_id)}")
+            members_count = cur.fetchone()['count']
+            
+            if members_count <= 1:
+                cur.execute(f"DELETE FROM {SCHEMA}.tasks WHERE family_id = {escape_string(family_id)}")
+                cur.execute(f"DELETE FROM {SCHEMA}.family_invites WHERE family_id = {escape_string(family_id)}")
+                cur.execute(f"DELETE FROM {SCHEMA}.family_members WHERE family_id = {escape_string(family_id)}")
+                cur.execute(f"DELETE FROM {SCHEMA}.families WHERE id = {escape_string(family_id)}")
+            else:
+                cur.execute(f"DELETE FROM {SCHEMA}.family_members WHERE user_id = {escape_string(user_id)}")
+        
+        cur.execute(f"DELETE FROM {SCHEMA}.users WHERE id = {escape_string(user_id)}")
+        
+        return {'success': True, 'message': 'Аккаунт успешно удалён'}
+    except Exception as e:
+        return {'error': f'Ошибка удаления: {str(e)}'}
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method = event.get('httpMethod', 'GET')
     
@@ -578,6 +622,23 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             elif path == 'logout':
                 token = event.get('headers', {}).get('X-Auth-Token', '') or event.get('headers', {}).get('x-auth-token', '')
                 result = logout_user(token)
+                return {
+                    'statusCode': 200,
+                    'headers': headers,
+                    'body': json.dumps(result),
+                    'isBase64Encoded': False
+                }
+            
+            elif path == 'delete_account':
+                token = event.get('headers', {}).get('X-Auth-Token', '') or event.get('headers', {}).get('x-auth-token', '')
+                result = delete_account(token)
+                if 'error' in result:
+                    return {
+                        'statusCode': 400,
+                        'headers': headers,
+                        'body': json.dumps(result),
+                        'isBase64Encoded': False
+                    }
                 return {
                     'statusCode': 200,
                     'headers': headers,
