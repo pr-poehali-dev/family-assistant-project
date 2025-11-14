@@ -26,8 +26,10 @@ export function useFamilyData() {
 
   const fetchFamilyData = useCallback(async () => {
     const token = getAuthToken();
-    if (!token) {
+    if (!token || token === '') {
       setLoading(false);
+      setData(null);
+      setError(null);
       return;
     }
 
@@ -119,11 +121,22 @@ export function useFamilyData() {
   };
 
   useEffect(() => {
+    const token = getAuthToken();
+    if (!token || token === '') {
+      setLoading(false);
+      setData(null);
+      setError(null);
+      return;
+    }
+    
     fetchFamilyData();
     
     // Автосинхронизация каждую минуту
     const syncInterval = setInterval(() => {
-      fetchFamilyData();
+      const currentToken = getAuthToken();
+      if (currentToken && currentToken !== '') {
+        fetchFamilyData();
+      }
     }, 60000); // 60 секунд
     
     return () => clearInterval(syncInterval);

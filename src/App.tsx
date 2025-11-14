@@ -45,6 +45,9 @@ const App = () => {
         setIsAuthenticated(false);
       }
     } else {
+      // Очищаем старые данные если что-то осталось
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
       setIsAuthenticated(false);
     }
     
